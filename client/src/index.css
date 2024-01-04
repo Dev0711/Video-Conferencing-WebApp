@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-color: rgb(15, 23, 42);
+  --title-color: rgb(255, 255, 255);
+  --text-color: rgb(148, 163, 184);
+  --first-color: rgb(99, 112, 132);
+  --second-color: rgb(56, 187, 246);
+
+  --body-font: "Montserrat", sans-serif;
+  --second-font: "Montagu Slab", serif;
+  --title-font-size: 2rem;
+  --h2-font-size: 1.5rem;
+  --h3-font-size: 1.25rem;
+  --h4-font-size: 1rem;
+  --normal-font-size: .938rem;
+  --small-font-size: .813rem;
+  --smaller-font-size: .75rem;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  @apply h-screen bg-center;
+  background: -webkit-radial-gradient(
+    circle,
+    rgb(12, 16, 94) 0%,
+    rgb(15, 30, 70) 50%,
+    rgb(15, 23, 42) 100%
+  );
+  background: radial-gradient(
+    circle,
+    rgb(12, 16, 94) 0%,
+    rgb(15, 30, 70) 50%,
+    rgb(15, 23, 42) 100%
+  );
+}

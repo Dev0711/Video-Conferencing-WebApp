@@ -1,0 +1,30 @@
+h1 {
+  font-weight: 900;
+  font-size: clamp(var(--title-font-size), 2.5rem, 3rem);
+  color: var(--title-color);
+}
+
+h2 {
+  font-weight: 600;
+  /* font-size: var(--h1-font-size); */
+  font-size: clamp(var(--h2-font-size), 2rem, 2.5rem);
+
+  color: var(--title-color);
+}
+
+h4 {
+  font-weight: 400;
+  font-size: var(--h3-font-size);
+  color: var(--title-color);
+}
+
+img {
+  height: auto;
+  max-width: 100%;
+}
+
+.btn {
+  padding: .5rem 1rem;
+  margin: .5rem;
+  cursor: pointer;
+}
