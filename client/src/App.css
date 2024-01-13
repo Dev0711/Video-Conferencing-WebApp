@@ -23,6 +23,20 @@ img {
   max-width: 100%;
 }
 
+input {
+
+  /* @apply max-w-6xl mx-6s; */
+
+  background: transparent;
+  outline: none;
+  border: 2px solid var(--title-color);
+  border-radius: 5px;
+}
+
+input:focus {
+  border-color: var(--second-color);
+}
+
 .btn {
   padding: .5rem 1rem;
   margin: .5rem;
