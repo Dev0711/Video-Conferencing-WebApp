@@ -1,5 +1,26 @@
 .auth-container {
     margin: 5rem auto;
-    border: 2px solid red;
+    /* border: 2px solid red; */
     width: fit-content;
+}
+
+.room-container {
+
+    @apply border-solid border-2 border-sky-500 rounded-md p-8;
+
+    margin: 5rem auto;
+    /* border: 2px solid red; */
+    width: fit-content;
+}
+
+.input-container {
+    @apply flex flex-col gap-5 px-2 py-5 w-full;
+}
+
+.btn__container {
+    @apply min-w-full flex justify-center;
+}
+
+.login-container, .signup-container {
+    @apply max-w-6xl mx-6 border-solid border-2 border-sky-500 rounded-md p-8;
 }

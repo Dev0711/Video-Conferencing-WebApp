@@ -15,7 +15,7 @@ export default function Home() {
                     </div>
                 </nav>
             </header>
-            <section className="main__section grid max-w-6xl mx-6s">
+            <section className="main__section grid max-w-6xl mx-6">
                     <div className='text__section max-w-6xl mx-6  flex flex-col '>
                         <h1>Virtual <span>Meeting</span> Platform For Online Video Conference</h1>
                         <h4>Get started with your first Meet..</h4>

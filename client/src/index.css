@@ -8,6 +8,7 @@
   --text-color: rgb(148, 163, 184);
   --first-color: rgb(99, 112, 132);
   --second-color: rgb(56, 187, 246);
+  --hover-color: rgb(0, 66, 97);
 
   --body-font: "Montserrat", sans-serif;
   --second-font: "Montagu Slab", serif;
@@ -27,7 +28,7 @@
 }
 
 body {
-  @apply h-screen bg-center;
+  @apply bg-center;
   background: -webkit-radial-gradient(
     circle,
     rgb(12, 16, 94) 0%,
