@@ -22,7 +22,7 @@ export default function Home() {
                         <h1>Virtual <span>Meeting</span> Platform For Online Video Conference</h1>
                         <h4>Get started with your first Meet..</h4>
                         <div className="btn-container">
-                            <button className="btn join__btn" onClick={() => navigate("/room")}>Join Meeting</button>
+                            <button className="btn join__btn" onClick={() => navigate("/joinroom")}>Join Meeting</button>
                             <button className="btn create__btn">Create Meeting</button>
                         </div>
                     </div>

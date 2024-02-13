@@ -1,0 +1,15 @@
+@media screen and (max-height: 29rem) {
+    .toolbar-container {
+        /* right: 0;
+        height: 100%;
+        width: fit-content;
+        flex-direction: column; */
+        @apply right-0 h-full w-fit flex-col;
+    }
+    .toolbar-btn-s {
+        /* flex-direction: column;
+        gap: 0;
+        padding-inline: .5rem; */
+        @apply gap-0 ps-2 flex-col;
+    }
+}

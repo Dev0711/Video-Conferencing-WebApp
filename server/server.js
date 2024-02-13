@@ -4,11 +4,15 @@ const PORT = process.env.PORT || 8000;
 const cors = require('cors')
 const mongoose = require('mongoose')
 const { MONGODB_URI } = require('./config/dev')
+const http = require('http')
+const { Server } = require('socket.io')
+const {socketConnection} = require('./lib/socket')
+
+
 
 //Middlewares
 app.use(cors())
 app.use(express.json())
-
 
 //Database connection -> Online
 mongoose.connect(MONGODB_URI, {
@@ -27,6 +31,13 @@ require("./models/user");
 
 app.use(require("./routes/auth"));
 
-app.listen(PORT, () => {
+//socket.io server 
+const server = http.createServer(app)
+const io = new Server(server)
+const meetingconn = io.of('/meeting')
+
+socketConnection(meetingconn)
+
+server.listen(PORT, () => {
     console.log("Server is running on:", PORT);
 });
