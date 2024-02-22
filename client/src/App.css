@@ -38,7 +38,7 @@ input {
 }
 
 input:focus {
-  border-color: var(--second-color);
+  outline-color: var(--second-color);
 }
 
 .btn {
