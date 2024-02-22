@@ -1,77 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const mongoose = require("mongoose");
-const User = mongoose.model("User");
+const User = require("../models/user");
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { JWT_SECRET } = require("../config/keys");
 
-router.post("/signup", (req, res) => {
-  const {
-    username,
-    email,
-    password,
-  } = req.body;
-
-  // Perform validation (similar to the frontend validation)
-  if (!username || !email || !password) {
-    return res
-      .status(422)
-      .json({ error: "Please fill in all the required fields." });
-  }
-
-  User.findOne({ email: email })
-    .then((savedUser) => {
-      if (savedUser) {
-        return res.status(422).json({ error: "User already exists." });
-      }
-
-      bcrypt
-        .hash(password, 12)
-        .then((hashedpassword) => {
-
-          const user = new User({
-            email,
-            password: hashedpassword,
-            username,
-          });
-
-          user
-            .save()
-            .then((user) => {
-              res.json({
-                message:
-                  "Account created successfully...",
-              });
-            })
-            .catch((err) => {
-              console.log(err);
-              res.status(500).json({
-                error:
-                  "An error occurred during user registration. Please try again later.",
-              });
-            });
-
-        })
-        .catch((err) => {
-          console.log(err);
-          res.status(500).json({
-            error:
-              "An error occurred during password hashing. Please try again later.",
-          });
-        });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({
-        error: "An error occurred during user lookup. Please try again later.",
-      });
-    });
-});
-
-
-router.post("/signin", (req, res) => {
+router.post("/auth", (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res
@@ -83,18 +17,27 @@ router.post("/signin", (req, res) => {
   User.findOne({ email: email })
     .then((savedUser) => {
       if (!savedUser) {
+        console.log(1);
         return res.status(422).json({ error: "Invalid email or password" });
       }
 
       // Compare the provided password with the stored hashed password
-      bcrypt.compare(password, savedUser.password).then((doMatch) => {
+      bcrypt.compare(password, savedUser.password).then(async (doMatch) => {
         if (doMatch) {
           // Password is correct, generate a JWT token for successful signin
-          const token = jwt.sign({ _id: savedUser._id }, JWT_SECRET);
+          const accessToken = jwt.sign({ _id: savedUser._id.toString() }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '5m' });
+          const refreshToken = jwt.sign({ _id: savedUser._id.toString() }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '1d' });
           const { _id, username, email } = savedUser;
 
+          // saving the user with refreshToken
+          savedUser.refreshToken = refreshToken;
+          const result = await savedUser.save();
+          // console.log(result);
+          
+          res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24*60*60*1000, sameSite: 'none', secure: true }) //secure: true
           res.json({
-            token,
+            accessToken,
+            refreshToken,
             user: { _id, username, email },
             message: "Successful SignIn!",
           });

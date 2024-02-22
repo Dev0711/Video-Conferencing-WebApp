@@ -1,43 +1,83 @@
-const express = require('express')
-const app = express()
+const express = require("express");
+const app = express();
 const PORT = process.env.PORT || 8000;
-const cors = require('cors')
-const mongoose = require('mongoose')
-const { MONGODB_URI } = require('./config/dev')
+require("dotenv").config();
+const cors = require("cors");
+const mongoose = require("mongoose");
+// const fs = require("fs");
+// const https = require("httpolyglot");
+// const { MONGODB_URI } = require('./config/dev')
 const http = require('http')
-const { Server } = require('socket.io')
-const {socketConnection} = require('./lib/socket')
+const { Server } = require("socket.io");
+const { socketConnection } = require("./lib/socket");
+const cookieParser = require("cookie-parser");
+const verifyToken = require("./middleware/verifytoken");
+const credentials = require("./middleware/credentials");
+const corsOptions = require("./config/corsOptions");
 
+// app.get('*', (req, res, next) => {
+//     // const path = '/sfu/'
 
+//     // console.log(req.path);
 
-//Middlewares
-app.use(cors())
-app.use(express.json())
+//     // if (req.path.indexOf(path) == 0 && req.path.length > path.length) return next()
+
+//     res.send(`You need to specify a room name in the path e.g. 'https://127.0.0.1/sfu/room'`)
+//   })
+
+app.use(express.json());
 
 //Database connection -> Online
-mongoose.connect(MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 });
 
-mongoose.connection.on("connected", () => {
-    console.log("Connected to MongoDb!");
-});
-mongoose.connection.on("error", (err) => {
-    console.log("Error on Connecting MongoDb!", err);
-});
+// const options = {
+//   key: fs.readFileSync("./ssl/key.pem", "utf-8"),
+//   cert: fs.readFileSync("./ssl/cert.pem", "utf-8"),
+// };
 
 require("./models/user");
 
+app.use(credentials);
+
+// Cross Origin Resource Sharing
+app.use(cors(corsOptions));
+// app.use(cors({
+//     origin: 'http://localhost:3000',
+//     credentials: true,  // Allow credentials (cookies, headers, etc.)
+// }))
+
+app.use(cookieParser());
+
+app.use(require("./routes/register"));
 app.use(require("./routes/auth"));
+app.use(require("./routes/refresh"));
+// app.use(require("./routes/logout"));
+// app.use(verifyToken);
 
-//socket.io server 
-const server = http.createServer(app)
-const io = new Server(server)
-const meetingconn = io.of('/meeting')
+//socket.io server
+const socketOptions = {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+};
 
-socketConnection(meetingconn)
+const server = http.createServer(app);
+const io = new Server(server, socketOptions);
+const socket = io.of("/meeting");
 
-server.listen(PORT, () => {
+mongoose.connection.once("open", () => {
+  console.log("Connected to MongoDb!");
+  server.listen(PORT, () => {
     console.log("Server is running on:", PORT);
+  });
+  socketConnection(socket)
 });
+mongoose.connection.on("error", (err) => {
+  console.log("Error on Connecting MongoDb!", err);
+});
+

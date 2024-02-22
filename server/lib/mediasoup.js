@@ -1,10 +1,10 @@
-const mediasoup = require("mediasoup");
+const mediasoup = require('mediasoup');
 
-let rooms = {}; // { roomName1: { Router, rooms: [ sicketId1, ... ] }, ...}
-let peers = {}; // { socketId1: { roomName1, socket, transports = [id1, id2,] }, producers = [id1, id2,] }, consumers = [id1, id2,], peerDetails }, ...}
-let transports = []; // [ { socketId1, roomName1, transport, consumer }, ... ]
-let producers = []; // [ { socketId1, roomName1, producer, }, ... ]
-let consumers = []; // [ { socketId1, roomName1, consumer, }, ... ]
+let rooms = {}; // { meetingId1: { Router, rooms: [ sicketId1, ... ] }, ...}
+let peers = {}; // { socketId1: { meetingId1, socket, transports = [id1, id2,] }, producers = [id1, id2,] }, consumers = [id1, id2,], peerDetails }, ...}
+let transports = []; // [ { socketId1, meetingId1, transport, consumer }, ... ]
+let producers = []; // [ { socketId1, meetingId1, producer, }, ... ]
+let consumers = []; // [ { socketId1, meetingId1, consumer, }, ... ]
 
 //? This is an Array of RtpCapabilities
 //? https://mediasoup.org/documentation/v3/mediasoup/rtp-parameters-and-capabilities/#RtpCodecCapability
@@ -27,19 +27,181 @@ const mediaCodecs = [
   },
 ];
 
-const mediasoupProcess = async (socket) => {
+
+const createWorker = async () => {
+  const worker = await mediasoup.createWorker({
+    rtcMinPort: 2000,
+    rtcMaxPort: 3000,
+  });
+  console.log(`worker pid ${worker.pid}`);
+
+  worker.on("died", (error) => {
+    // This implies something serious happened, so kill the application
+    console.error("mediasoup worker has died");
+    setTimeout(() => process.exit(1), 2000); // exit in 2 seconds
+  });
+
+  return worker;
+};
+
+const workerPromise =  createWorker();
+
+async function mediasoupProcess (socket) {
+  const worker = await workerPromise;
+  
+  const createRoom = async (meetingId, socketId) => {
+    // worker.createRouter(options)
+    // options = { mediaCodecs, appData }
+    // mediaCodecs -> defined above
+    // appData -> custom application data - we are not supplying any
+    // none of the two are required
+    // console.log(meetingId);
+    // console.log(socketId);
+    let router1;
+    let peers = [];
+    console.log(rooms);
+    if (rooms[meetingId]) {
+      router1 = rooms[meetingId].router;
+      peers = rooms[meetingId].peers || [];
+    } else {
+      console.log(worker);
+      router1 = await worker.createRouter({ mediaCodecs });
+    }
+  
+    console.log(`Router ID: ${router1.id}`, peers.length);
+  
+    rooms[meetingId] = {
+      router: router1,
+      peers: [...peers, socketId],
+    };
+  
+    return router1;
+  };
+  
+  const removeItems = (items, socketId, type) => {
+    //? For Removing items like, producers, consumers and transports..
+    items.forEach((item) => {
+      if (item.socketId === socket.id) {
+        item[type].close();
+      }
+    });
+    items = items.filter((item) => item.socketId !== socket.id);
+  
+    //? Returning items after removing particular item..
+    return items;
+  };
+  
+  //? Methods for adding producers, consumers and transports
+  const addTransport = (transport, meetingId, consumer) => {
+    transports = [
+      ...transports,
+      { socketId: socket.id, transport, meetingId, consumer },
+    ];
+  
+    peers[socket.id] = {
+      ...peers[socket.id],
+      transports: [...peers[socket.id].transports, transport.id],
+    };
+  };
+  
+  const addProducer = (producer, meetingId) => {
+    producers = [...producers, { socketId: socket.id, producer, meetingId }];
+  
+    peers[socket.id] = {
+      ...peers[socket.id],
+      producers: [...peers[socket.id].producers, producer.id],
+    };
+  };
+  
+  const addConsumer = (consumer, meetingId) => {
+    // add the consumer to the consumers list
+    consumers = [...consumers, { socketId: socket.id, consumer, meetingId }];
+  
+    // add the consumer id to the peers list
+    peers[socket.id] = {
+      ...peers[socket.id],
+      consumers: [...peers[socket.id].consumers, consumer.id],
+    };
+  };
+  
+  const informConsumers = (meetingId, socketId, id) => {
+    console.log(`just joined, id ${id} ${meetingId}, ${socketId}`);
+    // A new producer just joined
+    // let all consumers to consume this producer
+    producers.forEach((producerData) => {
+      if (
+        producerData.socketId !== socketId &&
+        producerData.meetingId === meetingId
+      ) {
+        const producerSocket = peers[producerData.socketId].socket;
+        // use socket to send producer id to producer
+        producerSocket.emit("new-producer", { producerId: id });
+      }
+    });
+  };
+  
+  const getTransport = (socketId) => {
+    const [producerTransport] = transports.filter(
+      (transport) => transport.socketId === socketId && !transport.consumer
+    );
+    return producerTransport.transport;
+  };
+  
+  //? To create a WebRtcTransport for created router..
+  const createWebRtcTransport = async (router) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        //? https://mediasoup.org/documentation/v3/mediasoup/api/#WebRtcTransportOptions
+        const webRtcTransport_options = {
+          listenIps: [
+            {
+              ip: "127.0.0.1", //? replace with relevant IP address
+              // announcedIp: '192.168.0.106',
+            },
+          ],
+          enableUdp: true,
+          enableTcp: true,
+          preferUdp: true,
+        };
+  
+        //? https://mediasoup.org/documentation/v3/mediasoup/api/#router-createWebRtcTransport
+        let transport = await router.createWebRtcTransport(
+          webRtcTransport_options
+        );
+        console.log(`transport id: ${transport.id}`);
+
+        
+  
+        transport.on("dtlsstatechange", (dtlsState) => {
+          if (dtlsState === "closed") {
+            transport.close();
+          }
+        });
+  
+        transport.on("close", () => {
+          console.log("transport closed");
+        });
+  
+        resolve(transport);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
 
   //? Listen for joining room event..
-  socket.on("joinRoom", async ({ roomName }, callback) => {
+  socket.on("joinRoom", async ({ meetingId }, callback) => {
     //? create Router if it does not exist
+    // console.log('joinroom');
+    console.log('this is room: ', rooms[meetingId]);
     const router =
-      (rooms[roomName] && rooms[roomName].get("data").router) ||
-      (await createRoom(roomName, socket.id));
-    // const router = await createRoom(roomName, socket.id)
+      (rooms[meetingId] && rooms[meetingId].router) ||
+      (await createRoom(meetingId, socket.id));
+    // const router = await createRoom(meetingId, socket.id)
 
     peers[socket.id] = {
       socket,
-      roomName, //? Name for the Router this Peer joined
+      meetingId, //? Name for the Router this Peer joined
       transports: [],
       producers: [],
       consumers: [],
@@ -58,10 +220,10 @@ const mediasoupProcess = async (socket) => {
 
   socket.on("createWebRtcTransport", async ({ consumer }, callback) => {
     // get Room Name from Peer's properties
-    const roomName = peers[socket.id].roomName;
+    const meetingId = peers[socket.id].meetingId;
 
-    // get Router (Room) object this peer is in based on RoomName
-    const router = rooms[roomName].router;
+    // get Router (Room) object this peer is in based on meetingId
+    const router = rooms[meetingId].router;
 
     createWebRtcTransport(router).then(
       (transport) => {
@@ -75,7 +237,7 @@ const mediasoupProcess = async (socket) => {
         });
 
         // add transport to Peer's properties
-        addTransport(transport, roomName, consumer);
+        addTransport(transport, meetingId, consumer);
       },
       (error) => {
         console.log(error);
@@ -85,13 +247,13 @@ const mediasoupProcess = async (socket) => {
 
   socket.on("getProducers", (callback) => {
     //return all producer transports
-    const { roomName } = peers[socket.id];
+    const { meetingId } = peers[socket.id];
 
     let producerList = [];
     producers.forEach((producerData) => {
       if (
         producerData.socketId !== socket.id &&
-        producerData.roomName === roomName
+        producerData.meetingId === meetingId
       ) {
         producerList = [...producerList, producerData.producer.id];
       }
@@ -119,11 +281,11 @@ const mediasoupProcess = async (socket) => {
       });
 
       // add producer to the producers array
-      const { roomName } = peers[socket.id];
+      const { meetingId } = peers[socket.id];
 
-      addProducer(producer, roomName);
+      addProducer(producer, meetingId);
 
-      informConsumers(roomName, socket.id, producer.id);
+      informConsumers(meetingId, socket.id, producer.id);
 
       console.log("Producer ID: ", producer.id, producer.kind);
 
@@ -161,8 +323,8 @@ const mediasoupProcess = async (socket) => {
       callback
     ) => {
       try {
-        const { roomName } = peers[socket.id];
-        const router = rooms[roomName].router;
+        const { meetingId } = peers[socket.id];
+        const router = rooms[meetingId].router;
         let consumerTransport = transports.find(
           (transportData) =>
             transportData.consumer &&
@@ -202,7 +364,7 @@ const mediasoupProcess = async (socket) => {
             );
           });
 
-          addConsumer(consumer, roomName);
+          addConsumer(consumer, meetingId);
 
           // from the consumer extract the following params
           // to send back to the Client
@@ -244,175 +406,17 @@ const mediasoupProcess = async (socket) => {
     producers = removeItems(producers, socket.id, "producer");
     transports = removeItems(transports, socket.id, "transport");
 
-    const { roomName } = peers[socket.id];
+    const { meetingId } = peers[socket.id];
     delete peers[socket.id];
 
     //? remove socket from room
-    rooms[roomName] = {
-      router: rooms[roomName].router,
-      peers: rooms[roomName].peers.filter((socketId) => socketId !== socket.id),
+    rooms[meetingId] = {
+      router: rooms[meetingId].router,
+      peers: rooms[meetingId].peers.filter((socketId) => socketId !== socket.id),
     };
   });
 };
 
-const createWorker = async () => {
-  const worker = await mediasoup.createWorker({
-    rtcMinPort: 2000,
-    rtcMaxPort: 2100,
-  });
-  console.log(`worker pid ${worker.pid}`);
-
-  worker.on("died", (error) => {
-    // This implies something serious happened, so kill the application
-    console.error("mediasoup worker has died");
-    setTimeout(() => process.exit(1), 2000); // exit in 2 seconds
-  });
-
-  return worker;
-};
-
-worker = createWorker();
-
-const createRoom = async (roomName, socketId) => {
-  // worker.createRouter(options)
-  // options = { mediaCodecs, appData }
-  // mediaCodecs -> defined above
-  // appData -> custom application data - we are not supplying any
-  // none of the two are required
-  let router1;
-  let peers = [];
-  if (rooms[roomName]) {
-    router1 = rooms[roomName].router;
-    peers = rooms[roomName].peers || [];
-  } else {
-    router1 = await worker.createRouter({ mediaCodecs });
-  }
-
-  console.log(`Router ID: ${router1.id}`, peers.length);
-
-  rooms[roomName] = {
-    router: router1,
-    peers: [...peers, socketId],
-  };
-
-  return router1;
-};
-
-const removeItems = (items, socketId, type) => {
-  //? For Removing items like, producers, consumers and transports..
-  items.forEach((item) => {
-    if (item.socketId === socket.id) {
-      item[type].close();
-    }
-  });
-  items = items.filter((item) => item.socketId !== socket.id);
-
-  //? Returning items after removing particular item..
-  return items;
-};
-
-//? Methods for adding producers, consumers and transports
-const addTransport = (transport, roomName, consumer) => {
-  transports = [
-    ...transports,
-    { socketId: socket.id, transport, roomName, consumer },
-  ];
-
-  peers[socket.id] = {
-    ...peers[socket.id],
-    transports: [...peers[socket.id].transports, transport.id],
-  };
-};
-
-const addProducer = (producer, roomName) => {
-  producers = [...producers, { socketId: socket.id, producer, roomName }];
-
-  peers[socket.id] = {
-    ...peers[socket.id],
-    producers: [...peers[socket.id].producers, producer.id],
-  };
-};
-
-const addConsumer = (consumer, roomName) => {
-  // add the consumer to the consumers list
-  consumers = [...consumers, { socketId: socket.id, consumer, roomName }];
-
-  // add the consumer id to the peers list
-  peers[socket.id] = {
-    ...peers[socket.id],
-    consumers: [...peers[socket.id].consumers, consumer.id],
-  };
-};
-
-const informConsumers = (roomName, socketId, id) => {
-  console.log(`just joined, id ${id} ${roomName}, ${socketId}`);
-  // A new producer just joined
-  // let all consumers to consume this producer
-  producers.forEach((producerData) => {
-    if (
-      producerData.socketId !== socketId &&
-      producerData.roomName === roomName
-    ) {
-      const producerSocket = peers[producerData.socketId].socket;
-      // use socket to send producer id to producer
-      producerSocket.emit("new-producer", { producerId: id });
-    }
-  });
-};
-
-const getTransport = (socketId) => {
-  const [producerTransport] = transports.filter(
-    (transport) => transport.socketId === socketId && !transport.consumer
-  );
-  return producerTransport.transport;
-};
-
-//? To create a WebRtcTransport for created router..
-const createWebRtcTransport = async (router) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      //? https://mediasoup.org/documentation/v3/mediasoup/api/#WebRtcTransportOptions
-      const webRtcTransport_options = {
-        listenIps: [
-          {
-            ip: "127.0.0.1", //? replace with relevant IP address
-            // announcedIp: '192.168.0.106',
-          },
-        ],
-        enableUdp: true,
-        enableTcp: true,
-        preferUdp: true,
-      };
-
-      //? https://mediasoup.org/documentation/v3/mediasoup/api/#router-createWebRtcTransport
-      let transport = await router.createWebRtcTransport(
-        webRtcTransport_options
-      );
-      console.log(`transport id: ${transport.id}`);
-
-      transport.on("dtlsstatechange", (dtlsState) => {
-        if (dtlsState === "closed") {
-          transport.close();
-        }
-      });
-
-      transport.on("close", () => {
-        console.log("transport closed");
-      });
-
-      resolve(transport);
-    } catch (error) {
-      reject(error);
-    }
-  });
-};
-
 module.exports = {
-  createWorker,
-  removeItems,
-  createWebRtcTransport,
-  addTransport,
-  addProducer,
-  addConsumer,
   mediasoupProcess,
 };
