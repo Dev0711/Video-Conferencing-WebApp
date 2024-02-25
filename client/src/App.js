@@ -20,6 +20,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route element={<RequireAuth />}>
               <Route path="/joinroom" element={<RoomEntry />} />
+            </Route>
               <Route
                 path="/meeting/:meetingId"
                 element={
@@ -28,7 +29,6 @@ function App() {
                   </MediaProvider>
                 }
               />
-            </Route>
           </Route>
         </Route>
       </Routes>

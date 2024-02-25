@@ -92,6 +92,7 @@ function Chat() {
                 <hr className="border-1 border-gray-300" />
                 <div className='flex gap-2 my-1 mx-px p-1 bg-slate-200 rounded'>
                     <input value={message} type="text" className='outline-none border-none focus:outline-none text-black p-1' onChange={(e) => setMessage((prev) => prev = e.target.value)} />
+                    <input type="file" id="fileInput" hidden />
                     <img src={file_upload} className='cursor-pointer -mx-1' alt="" />
                     <img src={send} className='cursor-pointer border-l-2 border-white px-1' onClick={handleSendMessage} alt="" />
                 </div>
