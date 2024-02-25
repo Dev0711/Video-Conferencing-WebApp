@@ -1,4 +1,5 @@
 const mediasoup = require('mediasoup');
+// const chatProcess = require('./chat')
 
 let rooms = {}; // { meetingId1: { Router, rooms: [ sicketId1, ... ] }, ...}
 let peers = {}; // { socketId1: { meetingId1, socket, transports = [id1, id2,] }, producers = [id1, id2,] }, consumers = [id1, id2,], peerDetails }, ...}
@@ -59,12 +60,12 @@ async function mediasoupProcess (socket) {
     // console.log(socketId);
     let router1;
     let peers = [];
-    console.log(rooms);
+    // console.log(rooms);
     if (rooms[meetingId]) {
       router1 = rooms[meetingId].router;
       peers = rooms[meetingId].peers || [];
     } else {
-      console.log(worker);
+      // console.log(worker);
       router1 = await worker.createRouter({ mediaCodecs });
     }
   
@@ -74,6 +75,8 @@ async function mediasoupProcess (socket) {
       router: router1,
       peers: [...peers, socketId],
     };
+
+    console.log(rooms);
   
     return router1;
   };
@@ -193,11 +196,13 @@ async function mediasoupProcess (socket) {
   socket.on("joinRoom", async ({ meetingId }, callback) => {
     //? create Router if it does not exist
     // console.log('joinroom');
-    console.log('this is room: ', rooms[meetingId]);
+    console.log('this is room: ', rooms);
     const router =
       (rooms[meetingId] && rooms[meetingId].router) ||
       (await createRoom(meetingId, socket.id));
     // const router = await createRoom(meetingId, socket.id)
+
+    socket.join(meetingId)
 
     peers[socket.id] = {
       socket,
@@ -210,6 +215,9 @@ async function mediasoupProcess (socket) {
         isAdmin: false, //? Is this Peer the Admin?
       },
     };
+
+    // console.log('this is peers: ', peers);
+    // console.log('this is rooms: ', peers);
 
     //? get Router RTP Capabilities
     const rtpCapabilities = router.rtpCapabilities;
@@ -415,6 +423,9 @@ async function mediasoupProcess (socket) {
       peers: rooms[meetingId].peers.filter((socketId) => socketId !== socket.id),
     };
   });
+
+
+  // chatProcess(socket, io);
 };
 
 module.exports = {
