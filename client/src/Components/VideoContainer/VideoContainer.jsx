@@ -388,7 +388,7 @@ export default function VideoContainer() {
                 producerToClose.consumer.close();
 
                 // remove the consumer transport from the list
-                consumerTransports = consumerTransportsRef.current.filter(
+                consumerTransportsRef.current = consumerTransportsRef.current.filter(
                     (transportData) => transportData.producerId !== remoteProducerId
                 );
 

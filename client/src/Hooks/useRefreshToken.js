@@ -2,7 +2,7 @@ import axios from '../Api/axios';
 import useAuth from './useAuth';
 
 const useRefreshToken = () => {
-    const { auth, setAuth } = useAuth();
+    const { setAuth } = useAuth();
 
     // console.log('auth: ', auth);
 

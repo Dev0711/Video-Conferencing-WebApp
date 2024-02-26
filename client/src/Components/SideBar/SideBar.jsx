@@ -6,7 +6,8 @@ import copy from '../../assets/images/copy.svg'
 import useToggle from '../../Hooks/useToggle';
 import useAuth from '../../Hooks/useAuth.js';
 import useMedia from '../../Hooks/useMedia.js';
-import { useState, useEffect } from 'react';
+import axios from '../../Api/axios.js';
+import { useState, useEffect, useRef } from 'react';
 
 function People() {
     const link = window.location.href;
@@ -45,11 +46,55 @@ function Chat() {
     const [message, setMessage] = useState('');
     const [chat, setChat] = useState([]);
 
+    const fileInputRef = useRef();
+
     const handleSendMessage = () => {
         // console.log('function fired..');
-        console.log('handleSendMessage function triggered:', message, user, meetingId);
-        socketRef.current.emit('message', message, user, meetingId);
+        // console.log('handleSendMessage function triggered:', message, user, meetingId);
+        // socketRef.current.emit('message', message, user, meetingId);
+
+        if (fileInputRef.current.files.length > 0) {
+            uploadFile(fileInputRef.current.files[0]);
+        } else {
+            // No file selected, just send the message
+            socketRef.current.emit('message', message, user, meetingId);
+        }
+
+        // Clear the input values after sending
+        setMessage('');
+        fileInputRef.current.value = '';
     }
+
+
+    const uploadFile = async (file) => {
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            // Send the file to the backend for processing
+            const response = await axios.post('/file', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            // Extract the file URL from the response
+            const fileUrl = response.data.file;
+
+            console.log(fileUrl);
+
+            // Send the file URL to the chat
+            socketRef.current.emit('message', fileUrl, user, meetingId);
+        } catch (error) {
+            console.error('Error uploading file:', error.message);
+            // showToast(`Error uploading file: ${error.message}`);
+        }
+    };
+
+    const isFileUrl = (message) => {
+        // Simple check to see if the message starts with the base URL for files
+        return message.startsWith('http://localhost:3000/files/');
+    };
 
     useEffect(() => {
         console.log("Inside useEffect");
@@ -84,7 +129,16 @@ function Chat() {
                                 <div className="time">{msg?.time}</div>
                             </div>
                             <div className="content">
-                                {msg?.message}
+                                {/* {msg?.message} */}
+                                {isFileUrl(msg?.message) ? (
+                                    // Render the file URL as a hyperlink
+                                    <a href={msg?.message} target="_blank" rel="noopener noreferrer">
+                                        {msg?.message}
+                                    </a>
+                                ) : (
+                                    // Render regular text message
+                                    msg?.message
+                                )}
                             </div>
                         </div>
                     ))}
@@ -92,8 +146,8 @@ function Chat() {
                 <hr className="border-1 border-gray-300" />
                 <div className='flex gap-2 my-1 mx-px p-1 bg-slate-200 rounded'>
                     <input value={message} type="text" className='outline-none border-none focus:outline-none text-black p-1' onChange={(e) => setMessage((prev) => prev = e.target.value)} />
-                    <input type="file" id="fileInput" hidden />
-                    <img src={file_upload} className='cursor-pointer -mx-1' alt="" />
+                    <input type="file" id="fileInput" ref={fileInputRef} hidden />
+                    <img src={file_upload} className='cursor-pointer -mx-1' alt="" onClick={() => {fileInputRef.current.click()}} />
                     <img src={send} className='cursor-pointer border-l-2 border-white px-1' onClick={handleSendMessage} alt="" />
                 </div>
             </section>

@@ -3,12 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import MeetImage from '../../assets/images/4.jpg';
 import { useEffect } from 'react';
 import useAuth from '../../Hooks/useAuth';
+import useToggle from '../../Hooks/useToggle';
 import Avatar from 'react-avatar'
+import ProfileCard from '../../Components/ProfileCard/ProfileCard';
 
 export default function Home() {
     const { auth } = useAuth();
 
     const navigate = useNavigate()
+
+    const { toggleClicked, handleToggleClick } = useToggle();
 
     console.log('this is auth at home -> ', auth);
     // console.log('this is username -> ', auth?.user?.username);
@@ -21,8 +25,9 @@ export default function Home() {
                     <a className="nav__logo">
                         ZEPT
                     </a>
-                    {auth && Object.keys(auth).length > 0 ? <Avatar name={auth?.user?.username} size={50} round={true} /> : <button className="btn join__btn" onClick={() => navigate("/auth/login")}>Login</button>}
+                    {auth && Object.keys(auth).length > 0 ? <Avatar className='cursor-pointer' name={auth?.user?.username} onClick={() => handleToggleClick('profile')} size={50} round={true} /> : <button className="btn join__btn" onClick={() => navigate("/auth/login")}>Login</button>}
                 </nav>
+                {auth && toggleClicked['profile'] && <ProfileCard />}
             </header>
             <section className="main__section grid max-w-6xl mx-6">
                 <div className='text__section max-w-6xl mx-6  flex flex-col '>

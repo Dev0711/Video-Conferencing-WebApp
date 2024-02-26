@@ -54,7 +54,9 @@ app.use(cookieParser());
 app.use(require("./routes/register"));
 app.use(require("./routes/auth"));
 app.use(require("./routes/refresh"));
-// app.use(require("./routes/logout"));
+app.use(require("./routes/logout"));
+app.use(require("./routes/file"));
+app.use(require("./routes/download"));
 // app.use(verifyToken);
 
 //socket.io server

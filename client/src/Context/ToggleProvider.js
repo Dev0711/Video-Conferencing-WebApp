@@ -7,6 +7,7 @@ const initialState = {
     'dropdown': false,
     'audio': true,
     'video': true,
+    'profile': false,
 };
 
 export const ToggleProvider = ({ children }) => {
