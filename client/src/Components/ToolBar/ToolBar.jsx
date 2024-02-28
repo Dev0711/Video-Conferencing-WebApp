@@ -5,14 +5,14 @@ import video from "../../assets/images/video.svg";
 import video_off from "../../assets/images/video-off.svg";
 import phone from "../../assets/images/phone.svg";
 import screen_share from "../../assets/images/screen-share.svg";
+import chalkboard from "../../assets/images/chalkboard.svg";
 // import dots_vertical from "../../assets/images/dots-vertical.svg";
-import dots from "../../assets/images/dots.svg";
-import MoreDropDown from "../MoreDropDown/MoreDropDown";
+// import dots from "../../assets/images/dots.svg";
 import useToggle from "../../Hooks/useToggle";
 import useMedia from "../../Hooks/useMedia";
 
-export default function ToolBar({setIsSideBar}) {
-    const { toggleClicked, handleToggleClick } = useToggle();
+export default function ToolBar() {
+    const { toggleClicked } = useToggle();
     const { toggleMedia } = useMedia();
 
 
@@ -32,13 +32,8 @@ export default function ToolBar({setIsSideBar}) {
                     <div className="screen-btn my-2 h-auto w-fit p-2 cursor-pointer">
                         <img className="w-auto lg:h-7" src={screen_share} alt="" />
                     </div>
-                    <div className="more-btn flex flex-col items-center my-2 h-auto w-fit cursor-pointer fill-red-700">
-                        <div className="p-2" onClick={() => handleToggleClick('dropdown')}>
-                            <img className="w-auto lg:h-7" src={dots} alt="" />
-                        </div>
-                        <div className="absolute bottom-16 lg:bottom-18 rounded">
-                            {toggleClicked['dropdown'] && <MoreDropDown />}
-                        </div>
+                    <div className="screen-btn my-2 h-auto w-fit p-2 cursor-pointer">
+                        <img className="w-auto lg:h-7" src={chalkboard} alt="" />
                     </div>
                 </div>
             </section>

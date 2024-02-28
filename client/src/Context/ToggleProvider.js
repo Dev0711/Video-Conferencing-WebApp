@@ -4,7 +4,6 @@ const ToggleContext = createContext({});
 
 const initialState = {
     'sidebar': false,
-    'dropdown': false,
     'audio': true,
     'video': true,
     'profile': false,

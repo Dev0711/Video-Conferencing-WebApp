@@ -9,7 +9,7 @@ export const MediaProvider = ({ children }) => {
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
 
-  const socketRef = useRef(null);
+  // const socketRef = useRef(null);
 
   const params = {
     // mediasoup params
@@ -68,7 +68,7 @@ export const MediaProvider = ({ children }) => {
       value={{
         localVideoRef,
         remoteVideoRef,
-        socketRef,
+        // socketRef,
         deviceRef,
         producerTransportRef,
         consumerTransportsRef,

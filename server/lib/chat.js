@@ -8,7 +8,7 @@ const chatProcess = (meetsocket, socket) => {
     const time = moment().format("h:mm a");
     try {
         console.log(meetingId, msg, user, time);
-        meetsocket.emit("message", msg, user, time);
+        meetsocket.to(meetingId).emit("message", msg, user, time);
         console.log('event emitted..');
     } catch (error) {
         console.error('Error emitting message event:', error);

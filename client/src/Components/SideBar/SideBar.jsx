@@ -1,5 +1,4 @@
 import { useParams } from 'react-router-dom';
-import x from '../../assets/images/x.svg';
 import send from '../../assets/images/send.svg';
 import file_upload from '../../assets/images/file-upload.svg';
 import copy from '../../assets/images/copy.svg'
@@ -143,7 +142,7 @@ function Chat() {
                         </div>
                     ))}
                 </div>
-                <hr className="border-1 border-gray-300" />
+                
                 <div className='flex gap-2 my-1 mx-px p-1 bg-slate-200 rounded'>
                     <input value={message} type="text" className='outline-none border-none focus:outline-none text-black p-1' onChange={(e) => setMessage((prev) => prev = e.target.value)} />
                     <input type="file" id="fileInput" ref={fileInputRef} hidden />
@@ -157,16 +156,16 @@ function Chat() {
 
 export default function SideBar() {
 
-    const { handleToggleClick, toggleSidebarOption, setToggleSidebarOption } = useToggle();
+    const { toggleSidebarOption, setToggleSidebarOption } = useToggle();
 
     return (
         <>
-            <div className="sidebar-container bg-white text-center h-[88%] w-fit px-5 pb-1 m-4 flex flex-col items-center rounded float-end z-50">
+            <div className="sidebar-container bg-white text-center h-[90%] w-fit px-5 pb-1 m-2 flex flex-col items-center rounded float-end z-50">
                 <div className="heading w-full flex flex-row gap-2 justify-end my-2">
                     <h4 className={`text-black text-center basis-1/2 ${toggleSidebarOption ? 'bg-slate-200' : ''} rounded cursor-pointer`} onClick={() => setToggleSidebarOption(true)} >People</h4>
                     <h4 className={`text-black text-center basis-1/2 ${!toggleSidebarOption ? 'bg-slate-200' : ''} rounded cursor-pointer`} onClick={() => setToggleSidebarOption(false)}>Chat</h4>
-                    <img src={x} onClick={() => handleToggleClick('sidebar')} className='cursor-pointer' alt="" />
                 </div>
+                <hr className="border-1 border-gray-300" />
                 {toggleSidebarOption && <People />}
                 {!toggleSidebarOption && <Chat />}
             </div>

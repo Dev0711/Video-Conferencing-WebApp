@@ -32,14 +32,18 @@ export default function PersistLogin() {
 
     return (
         <>
-            {isLoading ? <p>Loading</p> : <Outlet />}
+            {isLoading ? <img
+                src={Spinner}
+                className=' w-10 mx-auto block text-white'
+                alt="Loading..."
+            /> : <Outlet />}
         </>
     );
 }
 
-
-//<img
-// src={Spinner}
-// className=' w-10 mx-auto block text-white'
-// alt="Loading..."
-// />
+{/* <p>Loading</p> */ }
+{/* <img
+src={Spinner}
+className=' w-10 mx-auto block text-white'
+alt="Loading..."
+/> */}

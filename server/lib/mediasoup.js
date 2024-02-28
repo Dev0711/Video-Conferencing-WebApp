@@ -1,4 +1,4 @@
-const mediasoup = require('mediasoup');
+const mediasoup = require("mediasoup");
 // const chatProcess = require('./chat')
 
 let rooms = {}; // { meetingId1: { Router, rooms: [ sicketId1, ... ] }, ...}
@@ -28,7 +28,6 @@ const mediaCodecs = [
   },
 ];
 
-
 const createWorker = async () => {
   const worker = await mediasoup.createWorker({
     rtcMinPort: 2000,
@@ -45,12 +44,12 @@ const createWorker = async () => {
   return worker;
 };
 
-const workerPromise =  createWorker();
+const workerPromise = createWorker();
 
-async function mediasoupProcess (socket) {
+async function mediasoupProcess(socket) {
   const worker = await workerPromise;
-  
-  const createRoom = async (meetingId, socketId) => {
+
+  const createRoom = async (meetingId, socketId, user) => {
     // worker.createRouter(options)
     // options = { mediaCodecs, appData }
     // mediaCodecs -> defined above
@@ -58,29 +57,29 @@ async function mediasoupProcess (socket) {
     // none of the two are required
     // console.log(meetingId);
     // console.log(socketId);
-    let router1;
-    let peers = [];
+    let router;
+    let existingPeers = [];
     // console.log(rooms);
     if (rooms[meetingId]) {
-      router1 = rooms[meetingId].router;
-      peers = rooms[meetingId].peers || [];
+      router = rooms[meetingId].router;
+      existingPeers = rooms[meetingId].peers || [];
     } else {
       // console.log(worker);
-      router1 = await worker.createRouter({ mediaCodecs });
+      router = await worker.createRouter({ mediaCodecs });
     }
-  
-    console.log(`Router ID: ${router1.id}`, peers.length);
-  
+
+    console.log(`Router ID: ${router.id}`, existingPeers.length);
+
     rooms[meetingId] = {
-      router: router1,
-      peers: [...peers, socketId],
+      router: router,
+      peers: [...existingPeers, { socketId, user }],
     };
 
-    console.log(rooms);
-  
-    return router1;
+    // console.log(rooms);
+
+    return router;
   };
-  
+
   const removeItems = (items, socketId, type) => {
     //? For Removing items like, producers, consumers and transports..
     items.forEach((item) => {
@@ -89,46 +88,56 @@ async function mediasoupProcess (socket) {
       }
     });
     items = items.filter((item) => item.socketId !== socket.id);
-  
+
     //? Returning items after removing particular item..
     return items;
   };
-  
+
   //? Methods for adding producers, consumers and transports
   const addTransport = (transport, meetingId, consumer) => {
+    console.log("consumer in addTransport: ", consumer);
     transports = [
       ...transports,
       { socketId: socket.id, transport, meetingId, consumer },
     ];
-  
+
+    console.log("Transports after adding new transport: ", transports);
+
     peers[socket.id] = {
       ...peers[socket.id],
       transports: [...peers[socket.id].transports, transport.id],
     };
+    console.log("Peers after adding new transport to Peer: ", peers);
   };
-  
+
   const addProducer = (producer, meetingId) => {
     producers = [...producers, { socketId: socket.id, producer, meetingId }];
-  
+
+    console.log("Producers after adding new producer: ", producers);
+
     peers[socket.id] = {
       ...peers[socket.id],
       producers: [...peers[socket.id].producers, producer.id],
     };
+
+    console.log("Peers after adding new producer to Peer: ", peers);
   };
-  
+
   const addConsumer = (consumer, meetingId) => {
     // add the consumer to the consumers list
     consumers = [...consumers, { socketId: socket.id, consumer, meetingId }];
-  
+
     // add the consumer id to the peers list
     peers[socket.id] = {
       ...peers[socket.id],
       consumers: [...peers[socket.id].consumers, consumer.id],
     };
   };
-  
+
   const informConsumers = (meetingId, socketId, id) => {
-    console.log(`just joined, id ${id} ${meetingId}, ${socketId}`);
+    console.log(
+      `just joined, id: ${id}, meetingId: ${meetingId}, socketId: ${socketId}`
+    );
     // A new producer just joined
     // let all consumers to consume this producer
     producers.forEach((producerData) => {
@@ -137,19 +146,23 @@ async function mediasoupProcess (socket) {
         producerData.meetingId === meetingId
       ) {
         const producerSocket = peers[producerData.socketId].socket;
+        console.log("Meeting ID:", meetingId);
+        console.log("Socket ID:", socketId);
+        console.log("Old User Socket ID:", producerSocket.id);
+        // console.log("producerSocket: ", producerSocket.id);
         // use socket to send producer id to producer
-        producerSocket.emit("new-producer", { producerId: id });
+        producerSocket.emit("newProducer", { producerId: id });
       }
     });
   };
-  
+
   const getTransport = (socketId) => {
     const [producerTransport] = transports.filter(
       (transport) => transport.socketId === socketId && !transport.consumer
     );
     return producerTransport.transport;
   };
-  
+
   //? To create a WebRtcTransport for created router..
   const createWebRtcTransport = async (router) => {
     return new Promise(async (resolve, reject) => {
@@ -166,25 +179,23 @@ async function mediasoupProcess (socket) {
           enableTcp: true,
           preferUdp: true,
         };
-  
+
         //? https://mediasoup.org/documentation/v3/mediasoup/api/#router-createWebRtcTransport
         let transport = await router.createWebRtcTransport(
           webRtcTransport_options
         );
         console.log(`transport id: ${transport.id}`);
 
-        
-  
         transport.on("dtlsstatechange", (dtlsState) => {
           if (dtlsState === "closed") {
             transport.close();
           }
         });
-  
+
         transport.on("close", () => {
           console.log("transport closed");
         });
-  
+
         resolve(transport);
       } catch (error) {
         reject(error);
@@ -193,16 +204,16 @@ async function mediasoupProcess (socket) {
   };
 
   //? Listen for joining room event..
-  socket.on("joinRoom", async ({ meetingId }, callback) => {
+  socket.on("joinRoom", async ({ meetingId, user }, callback) => {
     //? create Router if it does not exist
     // console.log('joinroom');
-    console.log('this is room: ', rooms);
+    console.log("this is room: ", rooms);
     const router =
       (rooms[meetingId] && rooms[meetingId].router) ||
-      (await createRoom(meetingId, socket.id));
+      (await createRoom(meetingId, socket.id, user));
     // const router = await createRoom(meetingId, socket.id)
 
-    socket.join(meetingId)
+    socket.join(meetingId);
 
     peers[socket.id] = {
       socket,
@@ -215,6 +226,9 @@ async function mediasoupProcess (socket) {
         isAdmin: false, //? Is this Peer the Admin?
       },
     };
+
+    console.log("Rooms in join room: ", rooms);
+    console.log("Peers in join room: ", peers);
 
     // console.log('this is peers: ', peers);
     // console.log('this is rooms: ', peers);
@@ -258,6 +272,7 @@ async function mediasoupProcess (socket) {
     const { meetingId } = peers[socket.id];
 
     let producerList = [];
+    console.log("Producers: ", producers);
     producers.forEach((producerData) => {
       if (
         producerData.socketId !== socket.id &&
@@ -266,6 +281,8 @@ async function mediasoupProcess (socket) {
         producerList = [...producerList, producerData.producer.id];
       }
     });
+
+    console.log("producerList: ", producerList);
 
     // return the producer list back to the client
     callback(producerList);
@@ -333,7 +350,7 @@ async function mediasoupProcess (socket) {
       try {
         const { meetingId } = peers[socket.id];
         const router = rooms[meetingId].router;
-        let consumerTransport = transports.find(
+        const consumerTransport = transports.find(
           (transportData) =>
             transportData.consumer &&
             transportData.transport.id == serverConsumerTransportId
@@ -346,6 +363,7 @@ async function mediasoupProcess (socket) {
             rtpCapabilities,
           })
         ) {
+          console.log("Router can consume...");
           // transport can now consume and return a consumer
           const consumer = await consumerTransport.consume({
             producerId: remoteProducerId,
@@ -399,34 +417,58 @@ async function mediasoupProcess (socket) {
   );
 
   socket.on("consumer-resume", async ({ serverConsumerId }) => {
-    console.log("consumer resume");
     const { consumer } = consumers.find(
       (consumerData) => consumerData.consumer.id === serverConsumerId
     );
     await consumer.resume();
+    console.log("consumer resume");
   });
 
   //? Listen for the disconnect event..
   socket.on("disconnect", () => {
     //? do some cleanup
-    console.log("peer disconnected");
+
     consumers = removeItems(consumers, socket.id, "consumer");
     producers = removeItems(producers, socket.id, "producer");
     transports = removeItems(transports, socket.id, "transport");
 
+    console.log('socket.id: ', socket.id);
+    console.log(peers[socket.id]);
+
     const { meetingId } = peers[socket.id];
+
+    // socket.leave()
+
     delete peers[socket.id];
 
     //? remove socket from room
     rooms[meetingId] = {
       router: rooms[meetingId].router,
-      peers: rooms[meetingId].peers.filter((socketId) => socketId !== socket.id),
+      peers: rooms[meetingId].peers.filter(
+        (socketId) => socketId !== socket.id
+      ),
     };
+    console.log("peer disconnected");
   });
 
-
+  
+  // disconnectUnusedSockets(meetSocket);
   // chatProcess(socket, io);
-};
+}
+
+// function disconnectUnusedSockets (io) {
+//   console.log('Inside dis..');
+//   Object.keys(io.sockets.sockets).forEach((socketId) => {
+//     const socket = io.sockets.sockets[socketId];
+//     if (!peers[socketId] && !socket.rooms.size) {
+//       // If socket is not in peers and not in any rooms, disconnect it
+//       console.log(`Disconnecting unused socket: ${socketId}`);
+//       socket.disconnect(true);
+//     }
+//   });
+// };
+
+
 
 module.exports = {
   mediasoupProcess,
