@@ -1,19 +1,19 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import ToolBar from '../../Components/ToolBar/ToolBar';
 import SideBar from '../../Components/SideBar/SideBar';
 import VideoContainer from '../../Components/VideoContainer/VideoContainer';
 import useMedia from '../../Hooks/useMedia';
-import useToggle from '../../Hooks/useToggle';
+// import useToggle from '../../Hooks/useToggle';
 
 export default function MeetingRoom() {
-    const { audioProducer, videoProducer } = useMedia();
+    const { socketRef } = useMedia();
 
     const [isSocketConnected, setIsSocketConnected] = useState(false);
 
-    const socketRef = useRef(null);
+    // const socketRef = useRef(null);
 
-    const { toggleClicked } = useToggle();
+    // const { toggleClicked } = useToggle();s
 
     useEffect(() => {
         // Connect to the socket server
@@ -50,8 +50,9 @@ export default function MeetingRoom() {
     return (
         <main className="box absolute w-screen h-screen bg-[#202124] z-0">
             {/* {toggleClicked['sidebar'] && <SideBar />} */}
-            <SideBar />
-            {isSocketConnected && <VideoContainer socketRef={socketRef} />}
+            {isSocketConnected && <SideBar />}
+            {isSocketConnected && <VideoContainer />}
+            {/* {isSocketConnected && <ToolBar />} */}
             <ToolBar />
         </main>
     );

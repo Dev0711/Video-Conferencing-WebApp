@@ -4,7 +4,7 @@ import useMedia from '../../Hooks/useMedia';
 import * as mediasoup from 'mediasoup-client'
 import useAuth from '../../Hooks/useAuth';
 
-export default function VideoContainer({ socketRef }) {
+export default function VideoContainer() {
 
     // const [remoteStreams, setRemoteStreams] = useState([]);
 
@@ -12,13 +12,15 @@ export default function VideoContainer({ socketRef }) {
     const { user } = auth;
 
     const {
-        // socketRef,
+        socketRef,
         localVideoRef,
         deviceRef,
         producerTransportRef,
         consumerTransportsRef,
         audioParamsRef,
         videoParamsRef,
+        audioProducerRef,
+        videoProducerRef,
     } = useMedia();
 
     const { meetingId } = useParams();
@@ -26,11 +28,9 @@ export default function VideoContainer({ socketRef }) {
     // let producerTransport;
     // let consumerTransports = [];
 
-    let audioProducer;
-    let videoProducer;
+    // let audioProducer;
+    // let videoProducer;
     let consumingTransports = [];
-
-    // console.log(socketRef.current);
 
     useEffect(() => {
         if (socketRef.current) {
@@ -42,6 +42,8 @@ export default function VideoContainer({ socketRef }) {
                         audio: true,
                         video: true,
                     });
+
+                    console.log('stream: ', stream);
 
                     if (localVideoRef.current) {
                         localVideoRef.current.srcObject = stream;
@@ -160,6 +162,7 @@ export default function VideoContainer({ socketRef }) {
                             async (parameters, callback, errback) => {
                                 console.log('Inside producer produce.');
                                 console.log('Parameters inside producerTransportRef.current.produce: ', parameters);
+                                console.log('rtpParameters inside producerTransportRef.current.produce: ', parameters.rtpParameters);
 
                                 try {
                                     // tell the server to create a Producer
@@ -200,30 +203,33 @@ export default function VideoContainer({ socketRef }) {
                 // https://mediasoup.org/documentation/v3/mediasoup-client/api/#transport-produce
                 // this action will trigger the 'connect' and 'produce' events above
                 console.log('Inside connectSendTransport...');
-                audioProducer = await producerTransportRef.current.produce(audioParamsRef.current);
-                // setAudioProducer(producerTransport.produce(audioParamsRef.current));
-                videoProducer = await producerTransportRef.current.produce(videoParamsRef.current);
+                audioProducerRef.current = await producerTransportRef.current.produce(audioParamsRef.current);
+                // setaudioProducerRef.current(producerTransport.produce(audioParamsRef.current));
+                videoProducerRef.current = await producerTransportRef.current.produce(videoParamsRef.current);
                 // setVideoProducer(producerTransport.produce(videoParamsRef.current));
 
-                audioProducer.on("trackended", () => {
+                console.log('audioProducerRef.current: ', audioProducerRef.current);
+                console.log('videoProducerRef.current: ', videoProducerRef.current);
+
+                audioProducerRef.current.on("trackended", () => {
                     console.log("audio track ended");
 
                     // close audio track
                 })
 
-                audioProducer.on("transportclose", () => {
+                audioProducerRef.current.on("transportclose", () => {
                     console.log("audio transport ended");
 
                     // close audio track
                 });
 
-                videoProducer.on("trackended", () => {
+                videoProducerRef.current.on("trackended", () => {
                     console.log("video track ended");
 
                     // close video track
                 });
 
-                videoProducer.on("transportclose", () => {
+                videoProducerRef.current.on("transportclose", () => {
                     console.log("video transport ended");
 
                     // close video track
@@ -367,7 +373,7 @@ export default function VideoContainer({ socketRef }) {
                             newElem.innerHTML =
                                 '<video id="' +
                                 remoteProducerId +
-                                '" autoplay class="video" ></video>';
+                                '" autoplay className=" aspect-auto rounded-md object-contain video" ></video>';
                         }
 
                         videoContainer.appendChild(newElem);
@@ -391,6 +397,19 @@ export default function VideoContainer({ socketRef }) {
                     }
                 );
             };
+
+            socketRef.current.on("screenShareToggle", ({ socketId, enabled }) => {
+                // Handle the screen sharing toggle event
+                if (enabled) {
+                    // Screen sharing is enabled
+                    console.log(`User with socket ID ${socketId} started screen sharing`);
+                    // Implement any logic you need when screen sharing is started
+                } else {
+                    // Screen sharing is disabled
+                    console.log(`User with socket ID ${socketId} stopped screen sharing`);
+                    // Implement any logic you need when screen sharing is stopped
+                }
+            });
 
 
             socketRef.current.on("producer-closed", ({ remoteProducerId }) => {
@@ -422,8 +441,8 @@ export default function VideoContainer({ socketRef }) {
     // }, [socketRef.current]);
 
     return (
-        <section className='my-2 mx-auto border h-[90%] w-[60%] p-1 rounded-md'>
-            <video ref={localVideoRef} className=' w-full h-2/3 rounded-md object-cover' autoPlay muted></video>
+        <section className='my-2 mx-auto border h-[90%] w-[55%] p-3 rounded-md'>
+            <video ref={localVideoRef} className=' w-full h-[60%] rounded-md object-cover' autoPlay muted></video>
             {/* <Webcam ref={localVideoRef} /> */}
             {/* {remoteStreams} */}
             <div id="videoContainer"></div>

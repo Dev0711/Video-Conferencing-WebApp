@@ -28,6 +28,19 @@ const mediaCodecs = [
   },
 ];
 
+const screenSharingCodecs = [
+  {
+    kind: "video",
+    mimeType: "video/VP8",
+    payloadType: 96, 
+    clockRate: 90000,
+    channels: 1,
+    parameters: {
+      "x-google-start-bitrate": 1000,
+    },
+  },
+];
+
 const createWorker = async () => {
   const worker = await mediasoup.createWorker({
     rtcMinPort: 2000,
@@ -164,7 +177,7 @@ async function mediasoupProcess(socket) {
   };
 
   //? To create a WebRtcTransport for created router..
-  const createWebRtcTransport = async (router) => {
+  const createWebRtcTransport = async (router, enableSctp) => {
     return new Promise(async (resolve, reject) => {
       try {
         //? https://mediasoup.org/documentation/v3/mediasoup/api/#WebRtcTransportOptions
@@ -178,6 +191,7 @@ async function mediasoupProcess(socket) {
           enableUdp: true,
           enableTcp: true,
           preferUdp: true,
+          enableSctp,
         };
 
         //? https://mediasoup.org/documentation/v3/mediasoup/api/#router-createWebRtcTransport
@@ -201,6 +215,10 @@ async function mediasoupProcess(socket) {
         reject(error);
       }
     });
+  };
+
+  const createScreenSharingTransport = async (router) => {
+    return createWebRtcTransport(router, true);
   };
 
   //? Listen for joining room event..
@@ -424,6 +442,59 @@ async function mediasoupProcess(socket) {
     console.log("consumer resume");
   });
 
+  // socket.on("screenShareToggle", async ({ enabled }) => {
+
+  //   console.log('screenShareToggel listened...');
+
+  //   const { meetingId } = peers[socket.id];
+
+  //   // Notify other peers in the meeting about screen sharing toggle
+  //   socket
+  //     .to(meetingId)
+  //     .emit("screenShareToggle", { socketId: socket.id, enabled });
+
+  //   // If screen sharing is enabled, create a new producer for the screen
+  //   if (enabled) {
+  //     const router = rooms[meetingId].router;
+  //     const screenTransport = await createScreenSharingTransport(router);
+
+  //     const screenProducer = await screenTransport.produce({
+  //       kind: "video",
+  //       rtpParameters: {
+  //         mid: "1",
+  //         codecs: screenSharingCodecs, // Only VP8 for screen sharing
+  //         encodings: [{ rid: "r0", maxBitrate: 100000 }],
+  //         codecOptions: { videoGoogleStartBitrate: 1000 },
+  //       },
+  //       codecOptions: {
+  //         videoGoogleStartBitrate: 1000,
+  //       },
+  //     });
+
+  //     addTransport(screenTransport, meetingId, true);
+
+  //     addProducer(screenProducer, meetingId);
+
+  //     informConsumers(meetingId, socket.id, screenProducer.id);
+  //   }
+  //   // If screen sharing is disabled, close the screen producer and transport
+  //   else {
+  //     const screenProducer = producers.find(
+  //       (producer) =>
+  //         producer.socketId === socket.id && producer.kind === "video"
+  //     );
+  //     if (screenProducer) {
+  //       const screenTransport = transports.find(
+  //         (transport) => transport.socketId === socket.id && transport.consumer
+  //       );
+  //       if (screenTransport) {
+  //         screenTransport.transport.close();
+  //       }
+  //       screenProducer.producer.close();
+  //     }
+  //   }
+  // });
+
   //? Listen for the disconnect event..
   socket.on("disconnect", () => {
     //? do some cleanup
@@ -432,7 +503,7 @@ async function mediasoupProcess(socket) {
     producers = removeItems(producers, socket.id, "producer");
     transports = removeItems(transports, socket.id, "transport");
 
-    console.log('socket.id: ', socket.id);
+    console.log("socket.id: ", socket.id);
     console.log(peers[socket.id]);
 
     const { meetingId } = peers[socket.id];
@@ -450,25 +521,7 @@ async function mediasoupProcess(socket) {
     };
     console.log("peer disconnected");
   });
-
-  
-  // disconnectUnusedSockets(meetSocket);
-  // chatProcess(socket, io);
 }
-
-// function disconnectUnusedSockets (io) {
-//   console.log('Inside dis..');
-//   Object.keys(io.sockets.sockets).forEach((socketId) => {
-//     const socket = io.sockets.sockets[socketId];
-//     if (!peers[socketId] && !socket.rooms.size) {
-//       // If socket is not in peers and not in any rooms, disconnect it
-//       console.log(`Disconnecting unused socket: ${socketId}`);
-//       socket.disconnect(true);
-//     }
-//   });
-// };
-
-
 
 module.exports = {
   mediasoupProcess,
