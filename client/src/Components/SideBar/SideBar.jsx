@@ -120,8 +120,6 @@ function Chat() {
         return message.startsWith('http://localhost:8000/files/');
     };
 
-
-
     return (
         <>
             <section className="chat-container flex flex-col h-full my-1 w-fit">
