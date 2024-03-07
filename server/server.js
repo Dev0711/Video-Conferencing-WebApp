@@ -15,16 +15,6 @@ const verifyToken = require("./middleware/verifytoken");
 const credentials = require("./middleware/credentials");
 const corsOptions = require("./config/corsOptions");
 
-// app.get('*', (req, res, next) => {
-//     // const path = '/sfu/'
-
-//     // console.log(req.path);
-
-//     // if (req.path.indexOf(path) == 0 && req.path.length > path.length) return next()
-
-//     res.send(`You need to specify a room name in the path e.g. 'https://127.0.0.1/sfu/room'`)
-//   })
-
 app.use(express.json());
 
 //Database connection -> Online
@@ -55,9 +45,9 @@ app.use(require("./routes/register"));
 app.use(require("./routes/auth"));
 app.use(require("./routes/refresh"));
 app.use(require("./routes/logout"));
-app.use(require("./routes/file"));
-app.use(require("./routes/download"));
 // app.use(verifyToken);
+app.use(require("./routes/file"));
+app.use('/files', require("./routes/download"));
 
 //socket.io server
 const socketOptions = {

@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import useMedia from '../../Hooks/useMedia';
 import * as mediasoup from 'mediasoup-client'
 import useAuth from '../../Hooks/useAuth';
+import './remote-video.css'
 
 export default function VideoContainer() {
 
@@ -373,7 +374,7 @@ export default function VideoContainer() {
                             newElem.innerHTML =
                                 '<video id="' +
                                 remoteProducerId +
-                                '" autoplay className=" aspect-auto rounded-md object-contain video" ></video>';
+                                '" autoplay ></video>';
                         }
 
                         videoContainer.appendChild(newElem);
@@ -393,6 +394,7 @@ export default function VideoContainer() {
                         // so we need to inform the server to resume
                         socketRef.current.emit("consumer-resume", {
                             serverConsumerId: params.serverConsumerId,
+                            meetingId
                         });
                     }
                 );
@@ -445,7 +447,7 @@ export default function VideoContainer() {
             <video ref={localVideoRef} className=' w-full h-[60%] rounded-md object-cover' autoPlay muted></video>
             {/* <Webcam ref={localVideoRef} /> */}
             {/* {remoteStreams} */}
-            <div id="videoContainer"></div>
+            <div id="videoContainer" className=' flex gap-1 overflow-auto'></div>
         </section>
     );
 }

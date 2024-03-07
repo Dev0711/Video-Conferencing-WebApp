@@ -1,4 +1,4 @@
-import { createContext, useRef } from "react";
+import { createContext, useState, useRef } from "react";
 import useToggle from "../Hooks/useToggle";
 
 const MediaContext = createContext({});
@@ -48,20 +48,7 @@ export const MediaProvider = ({ children }) => {
   let audioEnabled;
   let videoEnabled;
 
-  // window.toggleMedia = function (type) {
-  //   // console.log("This is audio -> ",audioEnabled)
-  //   if (type === "audio") {
-  //     audioEnabled = !audioEnabled;
-  //     audioProducer.track.enabled = audioEnabled;
-  //     handleToggleClick("audio");
-  //   } else if (type === "video") {
-  //     videoEnabled = !videoEnabled;
-  //     videoProducer.track.enabled = videoEnabled;
-  //     handleToggleClick("video");
-  //   }
-  //   console.log("toggleMedia function is called");
-  //   // console.log('this is audio now -> ', audioEnabled);
-  // };
+  const [chat, setChat] = useState([]);
 
   const toggleVideo = async () => {
     const videoTrack = videoParamsRef.current.track;
@@ -113,6 +100,8 @@ export const MediaProvider = ({ children }) => {
       audioTrack.stop();
       audioProducerRef.current.close();
       audioProducerRef.current = null;
+
+      handleToggleClick('audio')
     } else {
       // If audioProducer doesn't exist, create a new producer with the audio track
       audioProducerRef.current = await producerTransportRef.current.produce({
@@ -212,10 +201,11 @@ export const MediaProvider = ({ children }) => {
         videoParamsRef,
         audioEnabled,
         videoEnabled,
-        // toggleMedia,
         toggleVideo,
         toggleAudio,
-        screenShareToggle,
+        // screenShareToggle,
+        chat,
+        setChat,
       }}
     >
       {children}

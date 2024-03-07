@@ -1,7 +1,8 @@
 const router = require('express').Router();
 const File = require('../models/file');
 
-router.get('files/:uuid', async (req, res) => {
+router.get('/:uuid', async (req, res) => {
+   console.log('download');
    // Extract link and get file from storage send download stream 
    const file = await File.findOne({ uuid: req.params.uuid });
    // Link expired

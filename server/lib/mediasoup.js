@@ -88,6 +88,8 @@ async function mediasoupProcess(socket) {
       peers: [...existingPeers, { socketId, user }],
     };
 
+    console.log('user peer -> ', rooms[meetingId].peers);
+
     // console.log(rooms);
 
     return router;
@@ -108,32 +110,32 @@ async function mediasoupProcess(socket) {
 
   //? Methods for adding producers, consumers and transports
   const addTransport = (transport, meetingId, consumer) => {
-    console.log("consumer in addTransport: ", consumer);
+    // console.log("consumer in addTransport: ", consumer);
     transports = [
       ...transports,
       { socketId: socket.id, transport, meetingId, consumer },
     ];
 
-    console.log("Transports after adding new transport: ", transports);
+    // console.log("Transports after adding new transport: ", transports);
 
     peers[socket.id] = {
       ...peers[socket.id],
       transports: [...peers[socket.id].transports, transport.id],
     };
-    console.log("Peers after adding new transport to Peer: ", peers);
+    // console.log("Peers after adding new transport to Peer: ", peers);
   };
 
   const addProducer = (producer, meetingId) => {
     producers = [...producers, { socketId: socket.id, producer, meetingId }];
 
-    console.log("Producers after adding new producer: ", producers);
+    // console.log("Producers after adding new producer: ", producers);
 
     peers[socket.id] = {
       ...peers[socket.id],
       producers: [...peers[socket.id].producers, producer.id],
     };
 
-    console.log("Peers after adding new producer to Peer: ", peers);
+    // console.log("Peers after adding new producer to Peer: ", peers);
   };
 
   const addConsumer = (consumer, meetingId) => {
@@ -159,9 +161,9 @@ async function mediasoupProcess(socket) {
         producerData.meetingId === meetingId
       ) {
         const producerSocket = peers[producerData.socketId].socket;
-        console.log("Meeting ID:", meetingId);
-        console.log("Socket ID:", socketId);
-        console.log("Old User Socket ID:", producerSocket.id);
+        // console.log("Meeting ID:", meetingId);
+        // console.log("Socket ID:", socketId);
+        // console.log("Old User Socket ID:", producerSocket.id);
         // console.log("producerSocket: ", producerSocket.id);
         // use socket to send producer id to producer
         producerSocket.emit("newProducer", { producerId: id });
@@ -226,10 +228,26 @@ async function mediasoupProcess(socket) {
     //? create Router if it does not exist
     // console.log('joinroom');
     console.log("this is room: ", rooms);
+
     const router =
       (rooms[meetingId] && rooms[meetingId].router) ||
       (await createRoom(meetingId, socket.id, user));
     // const router = await createRoom(meetingId, socket.id)
+
+    // let existingPeers = [];
+
+    // if (rooms[meetingId] && rooms[meetingId].router) {
+    //   existingPeers = rooms[meetingId].peers;
+
+    //   // console.log('existingPeers -> ', existingPeers);
+    //   rooms[meetingId] = {
+    //     router: router,
+    //     peers: [ ...existingPeers, { socketId: socket.id, user }],
+    //   };
+
+    // }
+    
+    console.log('rooms[meetingId] -> ', rooms[meetingId]);
 
     socket.join(meetingId);
 
@@ -245,11 +263,8 @@ async function mediasoupProcess(socket) {
       },
     };
 
-    console.log("Rooms in join room: ", rooms);
-    console.log("Peers in join room: ", peers);
-
-    // console.log('this is peers: ', peers);
-    // console.log('this is rooms: ', peers);
+    // console.log("Rooms in join room: ", rooms);
+    // console.log("Peers in join room: ", peers);
 
     //? get Router RTP Capabilities
     const rtpCapabilities = router.rtpCapabilities;
@@ -290,7 +305,7 @@ async function mediasoupProcess(socket) {
     const { meetingId } = peers[socket.id];
 
     let producerList = [];
-    console.log("Producers: ", producers);
+    // console.log("Producers: ", producers);
     producers.forEach((producerData) => {
       if (
         producerData.socketId !== socket.id &&
@@ -300,7 +315,7 @@ async function mediasoupProcess(socket) {
       }
     });
 
-    console.log("producerList: ", producerList);
+    // console.log("producerList: ", producerList);
 
     // return the producer list back to the client
     callback(producerList);
@@ -434,12 +449,16 @@ async function mediasoupProcess(socket) {
     }
   );
 
-  socket.on("consumer-resume", async ({ serverConsumerId }) => {
+  socket.on("consumer-resume", async ({ serverConsumerId, meetingId }) => {
     const { consumer } = consumers.find(
       (consumerData) => consumerData.consumer.id === serverConsumerId
     );
     await consumer.resume();
     console.log("consumer resume");
+
+    // console.log(rooms[meetingId]?.peers);
+
+    socket.to(meetingId).emit('users', { user: rooms[meetingId]?.peers })
   });
 
   // socket.on("screenShareToggle", async ({ enabled }) => {

@@ -7,7 +7,7 @@ import useMedia from '../../Hooks/useMedia';
 // import useToggle from '../../Hooks/useToggle';
 
 export default function MeetingRoom() {
-    const { socketRef } = useMedia();
+    const { socketRef, setChat } = useMedia();
 
     const [isSocketConnected, setIsSocketConnected] = useState(false);
 
@@ -40,6 +40,27 @@ export default function MeetingRoom() {
             if (socketRef.current) socketRef.current.disconnect();
         };
     }, []);
+
+    useEffect(() => {
+        console.log("Inside useEffect");
+        const handleMessage = (message, sender, time) => {
+            console.log('message event listened..');
+            const msg = {
+                message,
+                sender,
+                time
+            };
+            setChat((prev) => [...prev, msg]);
+        };
+
+        socketRef.current.on('message', handleMessage);
+
+        return () => {
+            console.log("Cleaning up message event listener");
+            socketRef.current.off('message', handleMessage);
+        };
+
+    }, [socketRef]);
 
 
     // useEffect(() => {

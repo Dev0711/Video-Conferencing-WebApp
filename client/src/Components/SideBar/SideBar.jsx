@@ -11,11 +11,21 @@ import { useState, useEffect, useRef } from 'react';
 function People() {
     const link = window.location.href;
 
+    const { socketRef } = useMedia()
+
     const copyLink = (e) => {
         e.preventDefault();
         navigator.clipboard.writeText(link);
     }
 
+    useEffect(() => {
+        socketRef.current.on('users', ({ user }) => {
+            console.log(user);
+        });
+        //   return () => {
+        //     effect
+        //   };
+    }, [socketRef]);
 
     return (
         <>
@@ -39,22 +49,20 @@ function Chat() {
     const { meetingId } = useParams();
 
     const { auth } = useAuth();
-    const { socketRef } = useMedia();
+    const { socketRef, chat } = useMedia();
 
     const user = auth?.user;
     const [message, setMessage] = useState('');
-    const [chat, setChat] = useState([]);
 
+    // const msgRef = useRef();
     const fileInputRef = useRef();
 
-    const handleSendMessage = () => {
-        // console.log('function fired..');
-        // console.log('handleSendMessage function triggered:', message, user, meetingId);
-        // socketRef.current.emit('message', message, user, meetingId);
+    const handleSendMessage = async () => {
 
         if (fileInputRef.current.files.length > 0) {
-            uploadFile(fileInputRef.current.files[0]);
-        } else {
+            const fileUrl = await uploadFile(fileInputRef.current.files[0]);
+            socketRef.current.emit('message', fileUrl, user, meetingId);
+        } else if (message !== '') {
             // No file selected, just send the message
             socketRef.current.emit('message', message, user, meetingId);
         }
@@ -64,6 +72,19 @@ function Chat() {
         fileInputRef.current.value = '';
     }
 
+    const handleFileInputChange = async (e) => {
+        const selectedFile = e.target.files[0];
+    
+        // Call uploadFile only if a file is selected
+        if (selectedFile) {
+            try {
+                const fileUrl = await uploadFile(selectedFile);
+                // console.log('fileUrl: ', fileUrl);
+            } catch (error) {
+                console.error('Error uploading file:', error.message);
+            }
+        }
+    }
 
     const uploadFile = async (file) => {
         try {
@@ -80,10 +101,13 @@ function Chat() {
             // Extract the file URL from the response
             const fileUrl = response.data.file;
 
-            console.log(fileUrl);
+            // console.log(fileUrl);
+
+            setMessage(fileUrl);
 
             // Send the file URL to the chat
-            socketRef.current.emit('message', fileUrl, user, meetingId);
+            return fileUrl
+            // socketRef.current.emit('message', fileUrl, user, meetingId);
         } catch (error) {
             console.error('Error uploading file:', error.message);
             // showToast(`Error uploading file: ${error.message}`);
@@ -91,47 +115,28 @@ function Chat() {
     };
 
     const isFileUrl = (message) => {
+        // console.log('file msg: ', message);
         // Simple check to see if the message starts with the base URL for files
-        return message.startsWith('http://localhost:3000/files/');
+        return message.startsWith('http://localhost:8000/files/');
     };
 
-    useEffect(() => {
-        console.log("Inside useEffect");
-        const handleMessage = (message, sender, time) => {
-            console.log('message event listened..');
-            const msg = {
-                message,
-                sender,
-                time
-            };
-            setChat((prev) => [...prev, msg]);
-        };
-    
-        console.log(socketRef.current);
-        socketRef.current.on('message', handleMessage);
 
-        return () => {
-            console.log("Cleaning up message event listener");
-            socketRef.current.off('message', handleMessage);
-        };
-
-    }, [socketRef, setChat]);
 
     return (
         <>
-            <section className="chat-container flex flex-col  h-full my-1 w-full">
+            <section className="chat-container flex flex-col h-full my-1 w-fit">
                 <div className='h-full overflow-auto'>
                     {chat.map((msg, index) => (
-                        <div key={index} className=" font-bold text-black mb-4 ml-3 bg-white rounded-sm">
-                            <div className="info">
+                        <div key={index} className=" mb-4 w-72 bg-slate-200 px-2 py-1 rounded-md">
+                            <div className="info flex justify-between text-xs font-medium text-blue-500">
                                 <div className="username">{msg?.sender?.username}</div>
                                 <div className="time">{msg?.time}</div>
                             </div>
-                            <div className="content">
+                            <div className="content text-base text-pretty text-left mt-1">
                                 {/* {msg?.message} */}
                                 {isFileUrl(msg?.message) ? (
                                     // Render the file URL as a hyperlink
-                                    <a href={msg?.message} target="_blank" rel="noopener noreferrer">
+                                    <a href={msg?.message} className=' cursor-pointer' target="_blank" rel="noopener noreferrer">
                                         {msg?.message}
                                     </a>
                                 ) : (
@@ -142,11 +147,11 @@ function Chat() {
                         </div>
                     ))}
                 </div>
-                
+
                 <div className='flex gap-2 my-1 mx-px p-1 bg-slate-200 rounded'>
-                    <input value={message} type="text" className='outline-none border-none focus:outline-none text-black p-1' onChange={(e) => setMessage((prev) => prev = e.target.value)} />
-                    <input type="file" id="fileInput" ref={fileInputRef} hidden />
-                    <img src={file_upload} className='cursor-pointer -mx-1' alt="" onClick={() => {fileInputRef.current.click()}} />
+                    <input value={message} type="text" className='outline-none w-58 border-none focus:outline-none text-black p-1' onChange={(e) => setMessage((prev) => prev = e.target.value)} />
+                    <input type="file" id="fileInput" ref={fileInputRef} onChange={handleFileInputChange} hidden />
+                    <img src={file_upload} className='cursor-pointer -mx-1' alt="" onClick={() => { fileInputRef.current.click() }} />
                     <img src={send} className='cursor-pointer border-l-2 border-white px-1' onClick={handleSendMessage} alt="" />
                 </div>
             </section>
