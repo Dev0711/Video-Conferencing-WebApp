@@ -18,7 +18,7 @@ import useMedia from "../../Hooks/useMedia";
 // }
 
 export default function ToolBar() {
-    const { toggleClicked, handleToggleClick } = useToggle();
+    const { toggleClicked } = useToggle();
     const { toggleAudio, toggleVideo } = useMedia();
 
     const navigate = useNavigate()
@@ -26,7 +26,7 @@ export default function ToolBar() {
 
     return (
         <>
-            <section className="toolbar-container absolute flex w-full bottom-0 justify-center items-center bg-black z-30">
+            <section className="toolbar-container absolute flex w-full bottom-0 justify-center items-center bg-black z-10">
                 <div className="toolbar-btn-s w-fit h-fit flex flex-row gap-10 lg:gap-20 justify-between items-center ps-1 pe-1">
                     <div className="leave-btn my-2 h-auto w-fit p-2 cursor-pointer rounded-full bg-red-600" onClick={() => navigate("/")}>
                         <img className="w-auto lg:h-7 -rotate-225" src={phone} alt="" />
@@ -40,7 +40,7 @@ export default function ToolBar() {
                     <div className="screen-btn my-2 h-auto w-fit p-2 cursor-pointer" >
                         <img className="w-auto lg:h-7" src={!toggleClicked['screenshare'] ? screen_share : screen_share_off} alt="" />
                     </div>
-                    <div className="screen-btn my-2 h-auto w-fit p-2 cursor-pointer" onClick={() => handleToggleClick('whiteboard')}>
+                    <div className="screen-btn my-2 h-auto w-fit p-2 cursor-pointer">
                         <img className="w-auto lg:h-7" src={chalkboard} alt="" />
                     </div>
                 </div>
