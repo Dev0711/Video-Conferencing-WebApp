@@ -8,7 +8,7 @@ const socketConnection = async (meetSocket) => {
   meetSocket.on("connection", async (socket) => {
     console.log("A new socket has been connected; socketId -> ", socket.id);
 
-    await mediasoupProcess(socket);
+    await mediasoupProcess(meetSocket, socket);
 
     chatProcess(meetSocket, socket)
 

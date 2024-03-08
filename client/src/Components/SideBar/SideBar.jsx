@@ -1,44 +1,45 @@
-import { useParams } from 'react-router-dom';
 import send from '../../assets/images/send.svg';
 import file_upload from '../../assets/images/file-upload.svg';
-import copy from '../../assets/images/copy.svg'
+import copy from '../../assets/images/copy.svg';
 import useToggle from '../../Hooks/useToggle';
 import useAuth from '../../Hooks/useAuth.js';
 import useMedia from '../../Hooks/useMedia.js';
 import axios from '../../Api/axios.js';
+import Avatar from 'react-avatar';
+import { useParams } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 
 function People() {
     const link = window.location.href;
 
-    const { socketRef } = useMedia()
+    const { people } = useMedia()
 
     const copyLink = (e) => {
         e.preventDefault();
         navigator.clipboard.writeText(link);
     }
 
-    useEffect(() => {
-        socketRef.current.on('users', ({ user }) => {
-            console.log(user);
-        });
-        //   return () => {
-        //     effect
-        //   };
-    }, [socketRef]);
-
     return (
         <>
             <section className="copy-link">
                 <h5 className='text-black my-1'>Invite people with this link</h5>
                 <div className='flex gap-2 my-1 mx-px p-1 bg-slate-200 rounded'>
-                    <input type="text" value={link} className='outline-none border-none focus:outline-none text-black p-1' readonly />
+                    <input type="text" value={link} className='outline-none border-none focus:outline-none text-black p-1' readOnly />
                     <img src={copy} className='cursor-pointer border-l-2 border-white px-2' onClick={copyLink} alt="" />
                 </div>
             </section>
             <hr className="border-1 border-gray-300" />
-            <section className="people-container overflow-auto  h-full my-1 w-full">
-
+            <section className="people-container flex flex-col overflow-auto h-full my-1 w-full">
+                {/* <div className="user flex gap-2 w-64 bg-slate-100 rounded-sm p-1 ">
+                    <Avatar name={'jd'} size={30} round={true} />
+                    <span>jd</span>
+                </div> */}
+                {people.map((user, index) => (
+                    <div key={index} className="user cursor-pointer flex gap-2 w-64 bg-slate-100 rounded-sm p-1 m-1">
+                        <Avatar name={user?.username} size={30} round={true} />
+                        <span>{user?.username}</span>
+                    </div>
+                ))}
             </section>
         </>
     )
@@ -56,6 +57,7 @@ function Chat() {
 
     // const msgRef = useRef();
     const fileInputRef = useRef();
+    const chatMessagesContainerRef = useRef(null);
 
     const handleSendMessage = async () => {
 
@@ -74,7 +76,7 @@ function Chat() {
 
     const handleFileInputChange = async (e) => {
         const selectedFile = e.target.files[0];
-    
+
         // Call uploadFile only if a file is selected
         if (selectedFile) {
             try {
@@ -119,18 +121,23 @@ function Chat() {
         // Simple check to see if the message starts with the base URL for files
         return message.startsWith('http://localhost:8000/files/');
     };
+  
+    useEffect(() => {
+      // Scroll to the bottom of the chat container when the chat array changes
+      chatMessagesContainerRef.current.scrollTop = chatMessagesContainerRef.current.scrollHeight;
+    }, [chat]);
 
     return (
         <>
-            <section className="chat-container flex flex-col h-full my-1 w-fit">
-                <div className='h-full overflow-auto'>
+            <section className="chat-container flex flex-col justify-between h-[91%] my-1 w-fit">
+                <div ref={chatMessagesContainerRef} className=' max-h-[90%] overflow-y-auto'>
                     {chat.map((msg, index) => (
-                        <div key={index} className=" mb-4 w-72 bg-slate-200 px-2 py-1 rounded-md">
+                        <div key={index} className=" mb-4 w-[15.45rem] bg-slate-200 px-2 py-1 rounded-md">
                             <div className="info flex justify-between text-xs font-medium text-blue-500">
                                 <div className="username">{msg?.sender?.username}</div>
                                 <div className="time">{msg?.time}</div>
                             </div>
-                            <div className="content text-base text-pretty text-left mt-1">
+                            <div className="content text-base break-words text-pretty text-left mt-1">
                                 {/* {msg?.message} */}
                                 {isFileUrl(msg?.message) ? (
                                     // Render the file URL as a hyperlink

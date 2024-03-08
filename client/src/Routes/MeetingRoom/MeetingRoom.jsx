@@ -7,13 +7,9 @@ import useMedia from '../../Hooks/useMedia';
 // import useToggle from '../../Hooks/useToggle';
 
 export default function MeetingRoom() {
-    const { socketRef, setChat } = useMedia();
+    const { socketRef, setChat, setPeople } = useMedia();
 
     const [isSocketConnected, setIsSocketConnected] = useState(false);
-
-    // const socketRef = useRef(null);
-
-    // const { toggleClicked } = useToggle();s
 
     useEffect(() => {
         // Connect to the socket server
@@ -55,6 +51,13 @@ export default function MeetingRoom() {
 
         socketRef.current.on('message', handleMessage);
 
+        socketRef.current.on('joined-users', ({ users }) => {
+
+            console.log('this is users: ', users);
+
+            setPeople((prev) => prev = users)
+        })
+
         return () => {
             console.log("Cleaning up message event listener");
             socketRef.current.off('message', handleMessage);
@@ -73,7 +76,6 @@ export default function MeetingRoom() {
             {/* {toggleClicked['sidebar'] && <SideBar />} */}
             {isSocketConnected && <SideBar />}
             {isSocketConnected && <VideoContainer />}
-            {/* {isSocketConnected && <ToolBar />} */}
             <ToolBar />
         </main>
     );

@@ -22,6 +22,8 @@ export default function VideoContainer() {
         videoParamsRef,
         audioProducerRef,
         videoProducerRef,
+        people,
+        setPeople,
     } = useMedia();
 
     const { meetingId } = useParams();
@@ -79,6 +81,13 @@ export default function VideoContainer() {
 
                     // once we have rtpCapabilities from the Router, create Device
                     if (socketRef.current && rtpCapabilities) createDevice(rtpCapabilities);
+
+                    socketRef.current.emit('new-user', { meetingId, user })
+
+                    // const newUser = data.newUser
+
+                    // setPeople((prev) => [...prev, newUser]);
+                    // console.log('this people after new user: ', people);
                 });
             };
 
@@ -400,19 +409,18 @@ export default function VideoContainer() {
                 );
             };
 
-            socketRef.current.on("screenShareToggle", ({ socketId, enabled }) => {
-                // Handle the screen sharing toggle event
-                if (enabled) {
-                    // Screen sharing is enabled
-                    console.log(`User with socket ID ${socketId} started screen sharing`);
-                    // Implement any logic you need when screen sharing is started
-                } else {
-                    // Screen sharing is disabled
-                    console.log(`User with socket ID ${socketId} stopped screen sharing`);
-                    // Implement any logic you need when screen sharing is stopped
-                }
-            });
-
+            // socketRef.current.on("screenShareToggle", ({ socketId, enabled }) => {
+            //     // Handle the screen sharing toggle event
+            //     if (enabled) {
+            //         // Screen sharing is enabled
+            //         console.log(`User with socket ID ${socketId} started screen sharing`);
+            //         // Implement any logic you need when screen sharing is started
+            //     } else {
+            //         // Screen sharing is disabled
+            //         console.log(`User with socket ID ${socketId} stopped screen sharing`);
+            //         // Implement any logic you need when screen sharing is stopped
+            //     }
+            // });
 
             socketRef.current.on("producer-closed", ({ remoteProducerId }) => {
                 // server notification is received when a producer is closed

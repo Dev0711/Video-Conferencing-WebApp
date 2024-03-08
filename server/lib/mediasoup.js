@@ -1,6 +1,7 @@
 const mediasoup = require("mediasoup");
 // const chatProcess = require('./chat')
 
+let users = {}
 let rooms = {}; // { meetingId1: { Router, rooms: [ sicketId1, ... ] }, ...}
 let peers = {}; // { socketId1: { meetingId1, socket, transports = [id1, id2,] }, producers = [id1, id2,] }, consumers = [id1, id2,], peerDetails }, ...}
 let transports = []; // [ { socketId1, meetingId1, transport, consumer }, ... ]
@@ -59,7 +60,7 @@ const createWorker = async () => {
 
 const workerPromise = createWorker();
 
-async function mediasoupProcess(socket) {
+async function mediasoupProcess(meetSocket, socket) {
   const worker = await workerPromise;
 
   const createRoom = async (meetingId, socketId, user) => {
@@ -68,8 +69,7 @@ async function mediasoupProcess(socket) {
     // mediaCodecs -> defined above
     // appData -> custom application data - we are not supplying any
     // none of the two are required
-    // console.log(meetingId);
-    // console.log(socketId);
+
     let router;
     let existingPeers = [];
     // console.log(rooms);
@@ -88,7 +88,12 @@ async function mediasoupProcess(socket) {
       peers: [...existingPeers, { socketId, user }],
     };
 
-    console.log('user peer -> ', rooms[meetingId].peers);
+    users[meetingId] = [
+      {
+        socketId,
+        ...user,
+      }
+    ]
 
     // console.log(rooms);
 
@@ -219,9 +224,9 @@ async function mediasoupProcess(socket) {
     });
   };
 
-  const createScreenSharingTransport = async (router) => {
-    return createWebRtcTransport(router, true);
-  };
+  // const createScreenSharingTransport = async (router) => {
+  //   return createWebRtcTransport(router, true);
+  // };
 
   //? Listen for joining room event..
   socket.on("joinRoom", async ({ meetingId, user }, callback) => {
@@ -234,20 +239,24 @@ async function mediasoupProcess(socket) {
       (await createRoom(meetingId, socket.id, user));
     // const router = await createRoom(meetingId, socket.id)
 
-    // let existingPeers = [];
+    // console.log('users in joinroom before: ', users[meetingId]);
 
-    // if (rooms[meetingId] && rooms[meetingId].router) {
-    //   existingPeers = rooms[meetingId].peers;
-
-    //   // console.log('existingPeers -> ', existingPeers);
-    //   rooms[meetingId] = {
-    //     router: router,
-    //     peers: [ ...existingPeers, { socketId: socket.id, user }],
-    //   };
-
-    // }
+    // console.log(newUser);
+    if(rooms[meetingId] && users[meetingId]) {
+      const userExists = users[meetingId].some(
+        (existingUser) => existingUser.socketId === socket.id
+      );
     
-    console.log('rooms[meetingId] -> ', rooms[meetingId]);
+      if (!userExists) {
+        // Add the user to the users array
+        users[meetingId].push({
+          socketId: socket.id,
+          ...user,
+        });
+      }
+    }
+
+    // console.log('users in joinroom: ', users[meetingId]);
 
     socket.join(meetingId);
 
@@ -272,6 +281,11 @@ async function mediasoupProcess(socket) {
     //? call callback from the client and send back the rtpCapabilities
     callback({ rtpCapabilities });
   });
+
+  socket.on('new-user', ({ meetingId }) => {
+
+    meetSocket.to(meetingId).emit('joined-users', { users: users[meetingId] } )
+  })
 
   socket.on("createWebRtcTransport", async ({ consumer }, callback) => {
     // get Room Name from Peer's properties
@@ -457,8 +471,6 @@ async function mediasoupProcess(socket) {
     console.log("consumer resume");
 
     // console.log(rooms[meetingId]?.peers);
-
-    socket.to(meetingId).emit('users', { user: rooms[meetingId]?.peers })
   });
 
   // socket.on("screenShareToggle", async ({ enabled }) => {
@@ -530,6 +542,10 @@ async function mediasoupProcess(socket) {
     // socket.leave()
 
     delete peers[socket.id];
+
+    users[meetingId] = users[meetingId].filter(
+      (user) => user.socketId !== socket.id
+    );  
 
     //? remove socket from room
     rooms[meetingId] = {

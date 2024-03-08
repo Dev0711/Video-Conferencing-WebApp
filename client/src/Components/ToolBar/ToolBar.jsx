@@ -13,6 +13,10 @@ import chalkboard from "../../assets/images/chalkboard.svg";
 import useToggle from "../../Hooks/useToggle";
 import useMedia from "../../Hooks/useMedia";
 
+// export function ToolTip({ text }) {
+//     return ()
+// }
+
 export default function ToolBar() {
     const { toggleClicked } = useToggle();
     const { toggleAudio, toggleVideo } = useMedia();

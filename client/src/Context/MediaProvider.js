@@ -1,4 +1,4 @@
-import { createContext, useState, useRef } from "react";
+import { createContext, useState, useRef, useEffect } from "react";
 import useToggle from "../Hooks/useToggle";
 
 const MediaContext = createContext({});
@@ -49,78 +49,7 @@ export const MediaProvider = ({ children }) => {
   let videoEnabled;
 
   const [chat, setChat] = useState([]);
-
-  const toggleVideo = async () => {
-    const videoTrack = videoParamsRef.current.track;
-
-    if (!videoTrack) {
-      // If video track doesn't exist, create a new video track
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      videoParamsRef.current = {
-        track: stream.getVideoTracks()[0],
-        ...videoParamsRef.current,
-      };
-    }
-
-    if (videoProducerRef.current) {
-      // If videoProducer exists, stop the video track and remove the producer
-      videoTrack.stop();
-      videoProducerRef.current.close();
-      videoProducerRef.current = null;
-
-      // localVideoRef.current.srcObject = null;
-    } else {
-      // If videoProducerRef.current doesn't exist, create a new one
-      const newVideoTrack = await navigator.mediaDevices
-        .getUserMedia({ video: true })
-        .then((stream) => stream.getVideoTracks()[0]);
-      videoProducerRef.current = await producerTransportRef.current.produce({
-        track: newVideoTrack,
-        kind: "video",
-      });
-
-      localVideoRef.current.srcObject = new MediaStream([newVideoTrack]);
-    }
-  };
-
-  const toggleAudio = async () => {
-    const audioTrack = audioParamsRef.current.track;
-
-    if (!audioTrack) {
-      // If audio track doesn't exist, create a new audio track
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      audioParamsRef.current = {
-        track: stream.getAudioTracks()[0],
-        ...audioParamsRef.current,
-      };
-    }
-
-    if (audioProducerRef.current) {
-      // If audioProducerRef.current exists, stop the audio track and remove the producer
-      audioTrack.stop();
-      audioProducerRef.current.close();
-      audioProducerRef.current = null;
-
-      handleToggleClick('audio')
-    } else {
-      // If audioProducer doesn't exist, create a new producer with the audio track
-      audioProducerRef.current = await producerTransportRef.current.produce({
-        track: audioTrack,
-        kind: "audio",
-      });
-    }
-
-  };
-
-  // function screenShareToggle() {
-  //   console.log(
-  //     "audioProducerRef.current before -> ",
-  //     audioProducerRef.current ? audioProducerRef.current.track : null
-  //   );
-  //   console.log(
-  //     "videoProducerRef.current before -> ",
-  //     videoProducerRef.current ? videoProducerRef.current.track : null
-  //   );
+  const [people, setPeople] = useState([]);
 
   //   let screenMediaPromise;
 
@@ -152,7 +81,7 @@ export const MediaProvider = ({ children }) => {
   //         if (screenStream.getAudioTracks().length > 0) {
   //           audioProducerRef.current.replaceTrack(screenStream.getAudioTracks()[0]);
   //         }
-  
+
   //         if (screenStream.getVideoTracks().length > 0) {
   //           videoProducerRef.current.replaceTrack(screenStream.getVideoTracks()[0]);
   //         }
@@ -185,6 +114,24 @@ export const MediaProvider = ({ children }) => {
   //     });
   // }
 
+  const toggleVideo = () => {
+    const videoTrack = localVideoRef.current.srcObject.getVideoTracks()[0];
+    videoTrack.enabled = !toggleClicked['video'];
+    // setIsVideoPaused(!isVideoPaused);
+    handleToggleClick('video')
+  };
+
+  const toggleAudio = () => {
+    const audioTrack = localVideoRef.current.srcObject.getAudioTracks()[0];
+    audioTrack.enabled = !toggleClicked['audio'];
+    // setIsAudioPaused(!isAudioPaused);
+    handleToggleClick('audio')
+  };
+
+  useEffect(() => {
+    console.log(people);
+  }, [people]);
+
   return (
     <MediaContext.Provider
       value={{
@@ -206,6 +153,8 @@ export const MediaProvider = ({ children }) => {
         // screenShareToggle,
         chat,
         setChat,
+        people,
+        setPeople,
       }}
     >
       {children}
