@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
 // const fs = require("fs");
 // const https = require("httpolyglot");
 // const { MONGODB_URI } = require('./config/dev')
-const http = require('http')
+const http = require("http");
 const { Server } = require("socket.io");
 const { socketConnection } = require("./lib/socket");
 const cookieParser = require("cookie-parser");
@@ -47,7 +47,7 @@ app.use(require("./routes/refresh"));
 app.use(require("./routes/logout"));
 // app.use(verifyToken);
 app.use(require("./routes/file"));
-app.use('/files', require("./routes/download"));
+app.use("/files", require("./routes/download"));
 
 //socket.io server
 const socketOptions = {
@@ -67,9 +67,8 @@ mongoose.connection.once("open", () => {
   server.listen(PORT, () => {
     console.log("Server is running on:", PORT);
   });
-  socketConnection(socket)
+  socketConnection(socket);
 });
 mongoose.connection.on("error", (err) => {
   console.log("Error on Connecting MongoDb!", err);
 });
-
