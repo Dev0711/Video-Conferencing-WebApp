@@ -5,6 +5,7 @@ import * as mediasoup from 'mediasoup-client'
 import useAuth from '../../Hooks/useAuth';
 import './remote-video.css'
 
+
 export default function VideoContainer() {
 
     // const [remoteStreams, setRemoteStreams] = useState([]);
@@ -443,10 +444,14 @@ export default function VideoContainer() {
     // }, [socketRef.current]);
 
     return (
-        <section className='my-2 mx-auto border h-[90%] w-[55%] p-3 rounded-md'>
+        <section className='my-2 mx-auto border h-[90%] w-[55%] p-3 rounded-md' >
             <video ref={localVideoRef} className=' w-full h-[60%] rounded-md object-cover' autoPlay muted></video>
+
+
+
             {/* <Webcam ref={localVideoRef} /> */}
             {/* {remoteStreams} */}
+
             <div id="videoContainer" className=' flex gap-1 overflow-auto'></div>
         </section>
     );
