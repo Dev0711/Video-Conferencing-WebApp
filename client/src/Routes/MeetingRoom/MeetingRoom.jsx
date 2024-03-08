@@ -4,17 +4,12 @@ import ToolBar from '../../Components/ToolBar/ToolBar';
 import SideBar from '../../Components/SideBar/SideBar';
 import VideoContainer from '../../Components/VideoContainer/VideoContainer';
 import useMedia from '../../Hooks/useMedia';
-import WhiteBoard from '../../Components/WhiteBoard/WhiteBoard';
-import useToggle from '../../Hooks/useToggle';
+// import useToggle from '../../Hooks/useToggle';
 
 export default function MeetingRoom() {
     const { socketRef, setChat, setPeople } = useMedia();
 
     const [isSocketConnected, setIsSocketConnected] = useState(false);
-
-    // const socketRef = useRef(null);
-
-    // const { toggleClicked } = useToggle();s
 
     useEffect(() => {
         // Connect to the socket server
@@ -81,9 +76,7 @@ export default function MeetingRoom() {
             {/* {toggleClicked['sidebar'] && <SideBar />} */}
             {isSocketConnected && <SideBar />}
             {isSocketConnected && <VideoContainer />}
-            {/* {isSocketConnected && <ToolBar />} */}
             <ToolBar />
-
         </main>
     );
 }
