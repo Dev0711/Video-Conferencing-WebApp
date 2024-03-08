@@ -18,7 +18,7 @@ import useMedia from "../../Hooks/useMedia";
 // }
 
 export default function ToolBar() {
-    const { toggleClicked } = useToggle();
+    const { toggleClicked, handleToggleClick } = useToggle();
     const { toggleAudio, toggleVideo } = useMedia();
 
     const navigate = useNavigate()
@@ -40,7 +40,7 @@ export default function ToolBar() {
                     <div className="screen-btn my-2 h-auto w-fit p-2 cursor-pointer" >
                         <img className="w-auto lg:h-7" src={!toggleClicked['screenshare'] ? screen_share : screen_share_off} alt="" />
                     </div>
-                    <div className="screen-btn my-2 h-auto w-fit p-2 cursor-pointer">
+                    <div className="screen-btn my-2 h-auto w-fit p-2 cursor-pointer" onClick={() => handleToggleClick('whiteboard')}>
                         <img className="w-auto lg:h-7" src={chalkboard} alt="" />
                     </div>
                 </div>

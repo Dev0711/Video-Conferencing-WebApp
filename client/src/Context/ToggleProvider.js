@@ -8,6 +8,7 @@ const initialState = {
     'video': true,
     'screenshare': false,
     'profile': false,
+    'whiteboard': false,
 };
 
 export const ToggleProvider = ({ children }) => {
