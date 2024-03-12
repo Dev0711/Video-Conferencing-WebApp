@@ -1,12 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NavBar from '../../Components/NavBar/NavBar';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import CvsDashBoard from './CvsDashboard/CvsDashBoard';
-import CvsKanban from './CvsKanban/CvsKanban';
-import CvsGantt from './CvsGantt/CvsGantt';
-import CvsCalendar from './CvsCalendar/CvsCalendar';
-import CvsChat from './CvsChat/CvsChat';
-import SideBar from './SideBar/SideBar';
+import ProjectRoute from './ProjectRoute/ProjectRoute';
+import useAuth from '../../Hooks/useAuth';
+import axios from "../../Api/axios";
 
 export function Project({ projects }) {
   const navigate = useNavigate();
@@ -34,52 +31,37 @@ export function Project({ projects }) {
   );
 }
 
-export function ProjectRoute() {
-  return (
-    <section className='flex gap-5 w-fit'>
-      <div className=' w-64 bg-black/20 px-5 py-5 flex flex-col justify-center'>
-        <SideBar />
-      </div>
-      <Routes>
-        <Route path='/' element={<CvsDashBoard />} />
-        <Route path='kanban' element={<CvsKanban />} />
-        <Route path='gantt' element={<CvsGantt />} />
-        <Route path='calendar' element={<CvsCalendar />} />
-        <Route path='chat' element={<CvsChat />} />
-      </Routes>
-    </section>
-  );
-}
-
 
 export default function CvsRoute() {
 
-  const [projects, setProject] = useState([
-    {
-      id: 1,
-      name: 'VideoCall Application',
-      bgColor: '#fcba03',
-      author: 'Jaydeep Khandla',
-    },
-    {
-      id: 2,
-      name: 'Project-V',
-      bgColor: '#018c8a',
-      author: 'Dev Oza',
-    },
-    {
-      id: 3,
-      name: 'Doordarshan',
-      bgColor: '#82d102',
-      author: 'Harsh Sonaiya',
-    },
-  ]);
+  const [projects, setProject] = useState([])
+
+  const { auth } = useAuth();
+  const { user } = auth;
+
+  console.log(user.email);
+  useEffect(async () => {
+    const payload = {
+      email: user.email
+    }
+    try {
+      const response = await axios.get("/projects", payload, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log(response);
+    } catch (error) {
+      console.log(error)
+    }
+
+  }, [projects]);
 
   return (
     <>
       <NavBar />
       <Routes>
-        <Route path='/' element={<Project projects={projects} />} />
+        <Route path='' element={<Project projects={projects} />} />
         <Route path='/:id/*' element={<ProjectRoute />} />
       </Routes>
     </>

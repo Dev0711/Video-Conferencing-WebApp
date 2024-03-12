@@ -456,25 +456,6 @@ export default function VideoContainer() {
     }, [socketRef]);
 
     // useEffect(() => {
-
-
-        // return () => {
-            // Cleanup on component unmount
-            // const ref = getScreenVideoRef();
-            // console.log('screen: ', ref.current);
-            // if (ref.current) {
-            //     const tracks = screenVideoRef.current.srcObject?.getTracks() || [];
-            //     tracks.forEach(track => track.stop());
-            //     ref.current.srcObject = null;
-            // }
-            // if(toggleClicked['screenshare'] == false){
-            //     stopScreenShare()
-            // }
-    //     };
-    // }, [toggleClicked['screenshare'], socketRef]);
-
-
-    // useEffect(() => {
     //   console.log('socketRef.current: ', socketRef.current);
     // }, [socketRef.current]);
 

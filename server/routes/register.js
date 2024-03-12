@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const User = require("../models/user");
-
+const speakeasy = require('speakeasy')
 const bcrypt = require("bcryptjs");
 
 router.post("/register", (req, res) => {
@@ -12,6 +12,15 @@ router.post("/register", (req, res) => {
       .status(422)
       .json({ error: "Please fill in all the required fields." });
   }
+
+  const otpSecret = speakeasy.generateSecret({ length: 20 }).base32;
+
+  // Generate OTP URI for QR code (optional, for user-friendly setup)
+  const otpUri = speakeasy.otpauthURL({
+    secret: otpSecret,
+    label: 'Zept',
+    issuer: 'Zept',
+  });
 
   User.findOne({ email: email })
     .then((savedUser) => {
