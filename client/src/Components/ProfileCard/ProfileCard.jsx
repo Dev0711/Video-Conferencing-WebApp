@@ -16,7 +16,7 @@ export default function ProfileCard() {
         await logout()
         handleToggleClick('profile')
 
-        // navigate('/')
+        navigate('/')
     }
 
     return (

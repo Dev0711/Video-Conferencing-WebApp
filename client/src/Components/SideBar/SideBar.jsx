@@ -6,6 +6,8 @@ import useAuth from '../../Hooks/useAuth.js';
 import useMedia from '../../Hooks/useMedia.js';
 import axios from '../../Api/axios.js';
 import Avatar from 'react-avatar';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useParams } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 
@@ -35,7 +37,7 @@ function People() {
                     <span>jd</span>
                 </div> */}
                 {people.map((user, index) => (
-                    <div key={index} className="user cursor-pointer flex gap-2 w-64 bg-slate-100 rounded-sm p-1 m-1">
+                    <div key={index} className="user cursor-pointer flex gap-2 w-[17.5rem] bg-slate-200 rounded-xl p-2 m-1">
                         <Avatar name={user?.username} size={30} round={true} />
                         <span>{user?.username}</span>
                     </div>
@@ -84,6 +86,7 @@ function Chat() {
                 // console.log('fileUrl: ', fileUrl);
             } catch (error) {
                 console.error('Error uploading file:', error.message);
+                toast.error(`Error uploading file: ${error.message}`);
             }
         }
     }
@@ -107,11 +110,14 @@ function Chat() {
 
             setMessage(fileUrl);
 
+            toast.success('File is Ready to be sent...')
+
             // Send the file URL to the chat
             return fileUrl
             // socketRef.current.emit('message', fileUrl, user, meetingId);
         } catch (error) {
             console.error('Error uploading file:', error.message);
+            toast.error(`Error uploading file: ${error.message}`);
             // showToast(`Error uploading file: ${error.message}`);
         }
     };
@@ -129,10 +135,10 @@ function Chat() {
 
     return (
         <>
-            <section className="chat-container flex flex-col justify-between h-[91%] my-1 w-fit">
+            <section className="chat-container flex flex-col justify-between h-[91%] my-1 ">
                 <div ref={chatMessagesContainerRef} className=' max-h-[90%] overflow-y-auto'>
                     {chat.map((msg, index) => (
-                        <div key={index} className=" mb-4 w-[15.45rem] bg-slate-200 px-2 py-1 rounded-md">
+                        <div key={index} className=" mb-4 w-[17rem] bg-slate-200 px-2 py-1 rounded-md">
                             <div className="info flex justify-between text-xs font-medium text-blue-500">
                                 <div className="username">{msg?.sender?.username}</div>
                                 <div className="time">{msg?.time}</div>
@@ -154,7 +160,7 @@ function Chat() {
                 </div>
 
                 <div className='flex gap-2 my-1 mx-px p-1 bg-slate-200 rounded'>
-                    <input value={message} type="text" className='outline-none w-58 border-none focus:outline-none text-black p-1' onChange={(e) => setMessage((prev) => prev = e.target.value)} />
+                    <input value={message} type="text" className='outline-none w-[13.25rem] border-none focus:outline-none text-black p-1' onChange={(e) => setMessage((prev) => prev = e.target.value)} />
                     <input type="file" id="fileInput" ref={fileInputRef} onChange={handleFileInputChange} hidden />
                     <img src={file_upload} className='cursor-pointer -mx-1' alt="" onClick={() => { fileInputRef.current.click() }} />
                     <img src={send} className='cursor-pointer border-l-2 border-white px-1' onClick={handleSendMessage} alt="" />
@@ -172,8 +178,8 @@ export default function SideBar() {
         <>
             <div className="sidebar-container bg-white text-center h-[90%] w-fit px-5 pb-1 m-2 flex flex-col items-center rounded float-end z-50">
                 <div className="heading w-full flex flex-row gap-2 justify-end my-2">
-                    <h4 className={`text-black text-center basis-1/2 ${toggleSidebarOption ? 'bg-slate-200' : ''} rounded cursor-pointer`} onClick={() => setToggleSidebarOption(true)} >People</h4>
-                    <h4 className={`text-black text-center basis-1/2 ${!toggleSidebarOption ? 'bg-slate-200' : ''} rounded cursor-pointer`} onClick={() => setToggleSidebarOption(false)}>Chat</h4>
+                    <h4 className={`text-black text-center basis-1/2 ${toggleSidebarOption ? 'bg-slate-300' : ''} rounded cursor-pointer`} onClick={() => setToggleSidebarOption(true)} >People</h4>
+                    <h4 className={`text-black text-center basis-1/2 ${!toggleSidebarOption ? 'bg-slate-300' : ''} rounded cursor-pointer`} onClick={() => setToggleSidebarOption(false)}>Chat</h4>
                 </div>
                 <hr className="border-1 border-gray-300" />
                 {toggleSidebarOption && <People />}

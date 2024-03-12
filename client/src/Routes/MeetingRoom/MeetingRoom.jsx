@@ -81,7 +81,7 @@ export default function MeetingRoom() {
             {isSocketConnected && <SideBar />}
             {isSocketConnected && <VideoContainer />}
             <ToolBar />
-            { toggleClicked['whiteboard'] && <WhiteBoard/> }
+            {/* { toggleClicked['whiteboard'] && <WhiteBoard/> } */}
         </main>
     );
 }

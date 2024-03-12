@@ -1,17 +1,22 @@
 import { Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "./App.css";
 import Home from "./Routes/Home/Home";
 import Auth from "./Routes/Auth/Auth";
 import RoomEntry from "./Routes/MeetingRoomEntry/MeetingRoomEntry";
 import MeetingRoom from "./Routes/MeetingRoom/MeetingRoom";
-import "./App.css";
 import Layout from "./Components/Layout/Layout";
 import RequireAuth from "./Components/RequireAuth/RequireAuth";
 import PersistLogin from "./Components/PersistLogin/PersistLogin";
 import { MediaProvider } from "./Context/MediaProvider";
+import CvsRoute from "./Routes/CvsRoute/CvsRoute";
+import ProjectInvitation from "./Routes/CvsRoute/ProjectInvitation/ProjectInvitaion";
 
 function App() {
   return (
     <>
+          <ToastContainer />
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route path="/auth/*" element={<Auth />} />
@@ -28,6 +33,8 @@ function App() {
                   </MediaProvider>
                 }
               />
+              <Route path="/office/*" element={<CvsRoute />} />
+              <Route path="/projectInvitaion" element={<ProjectInvitation />} />
             </Route>
           </Route>
         </Route>

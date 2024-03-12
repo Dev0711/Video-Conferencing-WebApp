@@ -1,3 +1,7 @@
+@import url('https://cdn.syncfusion.com/ej2/material.css');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@500;700;&display=swap");
+@import url("tldraw/tldraw.css");
+
 .border-red {
   border: 2px solid red;
 }
@@ -45,4 +49,15 @@ input:focus {
   padding: .5rem 1rem;
   margin: .5rem;
   cursor: pointer;
+}
+
+.form-section{
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  color: white;
+}
+
+.form-section select {
+  color: black;
 }

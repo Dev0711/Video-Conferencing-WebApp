@@ -28,24 +28,23 @@ export default function ToolBar() {
         <>
             <section className="toolbar-container absolute flex w-full bottom-0 justify-center items-center bg-black z-10">
                 <div className="toolbar-btn-s w-fit h-fit flex flex-row gap-10 lg:gap-20 justify-between items-center ps-1 pe-1">
-                    <div className="leave-btn my-2 h-auto w-fit p-2 cursor-pointer rounded-full bg-red-600" onClick={() => navigate("/")}>
+                    <div title='leave meeting' className="leave-btn my-2 h-auto w-fit p-2 cursor-pointer rounded-full bg-red-600" onClick={() => navigate("/")}>
                         <img className="w-auto lg:h-7 -rotate-225" src={phone} alt="" />
                     </div>
-                    <div className="mic-btn my-2 h-auto w-fit p-2 cursor-pointer" onClick={() => toggleAudio()} >
-                        <img className="w-auto lg:h-7" src={toggleClicked['audio'] ? microphone : microphone_off} alt="" />
+                    <div title={toggleClicked['audio'] ? 'mute audio' : 'unmute audio'} className="mic-btn my-2 h-auto w-fit p-2 cursor-pointer" onClick={() => toggleAudio()} >
+                        <img className="w-auto lg:h-7" src={toggleClicked['audio'] ? microphone_off : microphone} alt="" />
                     </div>
-                    <div className="video-btn my-2 h-auto w-fit p-2 cursor-pointer" onClick={() => toggleVideo()}>
-                        <img className="w-auto lg:h-7" src={toggleClicked['video'] ? video : video_off} alt="" />
+                    <div title={toggleClicked['audio'] ? 'show video' : 'hide video'} className="video-btn my-2 h-auto w-fit p-2 cursor-pointer" onClick={() => toggleVideo()}>
+                        <img className="w-auto lg:h-7" src={toggleClicked['video'] ? video_off : video} alt="" />
                     </div>
-                    <div className="screen-btn my-2 h-auto w-fit p-2 cursor-pointer" >
+                    {/* <div className="screen-btn my-2 h-auto w-fit p-2 cursor-pointer" onClick={() => handleToggleClick('screenshare')}>
                         <img className="w-auto lg:h-7" src={!toggleClicked['screenshare'] ? screen_share : screen_share_off} alt="" />
-                    </div>
-                    <div className="screen-btn my-2 h-auto w-fit p-2 cursor-pointer" onClick={() => handleToggleClick('whiteboard')}>
+                    </div> */}
+                    <div title='whiteboard' className="screen-btn my-2 h-auto w-fit p-2 cursor-pointer" onClick={() => handleToggleClick('whiteboard')}>
                         <img className="w-auto lg:h-7" src={chalkboard} alt="" />
                     </div>
                 </div>
             </section>
-
         </>
     );
 }

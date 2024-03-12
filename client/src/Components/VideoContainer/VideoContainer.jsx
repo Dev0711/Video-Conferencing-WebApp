@@ -1,9 +1,13 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import useMedia from '../../Hooks/useMedia';
-import * as mediasoup from 'mediasoup-client'
-import useAuth from '../../Hooks/useAuth';
 import './remote-video.css'
+import useAuth from '../../Hooks/useAuth';
+import useMedia from '../../Hooks/useMedia';
+import useToggle from '../../Hooks/useToggle';
+import { useParams } from 'react-router-dom';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Tldraw } from "tldraw";
+import * as mediasoup from 'mediasoup-client'
+import { useEffect, useRef } from 'react';
 
 export default function VideoContainer() {
 
@@ -15,6 +19,7 @@ export default function VideoContainer() {
     const {
         socketRef,
         localVideoRef,
+        // screenVideoRef,
         deviceRef,
         producerTransportRef,
         consumerTransportsRef,
@@ -22,12 +27,15 @@ export default function VideoContainer() {
         videoParamsRef,
         audioProducerRef,
         videoProducerRef,
-        people,
-        setPeople,
     } = useMedia();
 
+    
+    const { toggleClicked } = useToggle();
+    
     const { meetingId } = useParams();
-
+    
+    // const screenVideoRef = useRef(null);
+    // const getScreenVideoRef = useCallback(() => screenVideoRef, []); 
     // let producerTransport;
     // let consumerTransports = [];
 
@@ -46,7 +54,7 @@ export default function VideoContainer() {
                         video: true,
                     });
 
-                    console.log('stream: ', stream);
+                    // console.log('stream: ', stream);
 
                     if (localVideoRef.current) {
                         localVideoRef.current.srcObject = stream;
@@ -64,6 +72,7 @@ export default function VideoContainer() {
                     joinRoom();
                 } catch (error) {
                     console.log(error.message);
+                    toast.error(error.message);
                 }
             };
 
@@ -116,8 +125,10 @@ export default function VideoContainer() {
                     if (socketRef.current) createSendTransport();
                 } catch (error) {
                     console.log(error);
+                    toast.error(error)
                     if (error.name === "UnsupportedError")
                         console.warn("browser not supported");
+                        toast.warn("browser not supported");
                 }
             };
 
@@ -274,6 +285,7 @@ export default function VideoContainer() {
                             // {InvalidStateError} if not loaded
                             // {TypeError} if wrong arguments.
                             console.log(error);
+                            toast.error(error);
                             return;
                         }
 
@@ -445,17 +457,67 @@ export default function VideoContainer() {
         }
     }, [socketRef]);
 
+    useEffect(() => {
+
+        const startScreenShare = async () => {
+            try {
+                const screenStream = await navigator.mediaDevices.getDisplayMedia({
+                    video: true,
+                });
+                if (screenVideoRef.current) {
+                    screenVideoRef.current.srcObject = screenStream;
+                }
+            } catch (error) {
+                alert(error)
+            }
+        }
+
+        const stopScreenShare = () => {
+            const ref = getScreenVideoRef();
+            console.log('hello: ', ref.current);
+            if (ref.current) {
+                console.log(1);
+                const tracks = screenVideoRef.current.getTracks();
+                tracks.forEach(track => track.stop());
+                ref.current.srcObject = null;
+            }
+        };
+
+        if (toggleClicked['screenshare']) {
+            startScreenShare()
+        }if(toggleClicked['screenshare'] == false){
+            stopScreenShare()
+        }
+        return () => {
+            // Cleanup on component unmount
+            const ref = getScreenVideoRef();
+            console.log('screen: ', ref.current);
+            if (ref.current) {
+                const tracks = screenVideoRef.current.srcObject?.getTracks() || [];
+                tracks.forEach(track => track.stop());
+                ref.current.srcObject = null;
+            }
+            // if(toggleClicked['screenshare'] == false){
+            //     stopScreenShare()
+            // }
+        };
+    }, [toggleClicked['screenshare'], socketRef]);
+
 
     // useEffect(() => {
     //   console.log('socketRef.current: ', socketRef.current);
     // }, [socketRef.current]);
 
     return (
-        <section className='my-2 mx-auto border h-[90%] w-[55%] p-3 rounded-md'>
-            <video ref={localVideoRef} className=' w-full h-[60%] rounded-md object-cover' autoPlay muted></video>
+        <section className=' relative my-2 flex flex-col mx-auto bg-[#292b2e] h-[90%] w-[55%] p-3 rounded-md'>
+            <video ref={localVideoRef} className={` relative z-10 ${toggleClicked['screenshare'] ? ' w-44 h-[20%] m-2' : 'w-full h-[60%]'}  rounded-md object-cover`} autoPlay muted></video>
+            {/* {toggleClicked['screenshare'] && <video ref={screenVideoRef} className=' absolute mx-auto inset-0 w-[97.3%] mt-3 h-[58.1%] border rounded-md object-cover' autoPlay muted></video>} */}
             {/* <Webcam ref={localVideoRef} /> */}
             {/* {remoteStreams} */}
-            <div id="videoContainer" className=' flex gap-1 overflow-auto'></div>
+            <div id="videoContainer" className=' h-full flex gap-1 overflow-auto'></div>
+            { toggleClicked['whiteboard'] && <div className=" absolute z-20 mx-auto top-0 left-0 h-full w-full ">
+                <Tldraw />
+            </div>}
         </section>
     );
 }

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from '../../Api/axios';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function SignUp(props) {
     const [username, setUserName] = useState("");
@@ -56,6 +58,12 @@ export default function SignUp(props) {
         // }
         
         try {
+            if (!email || !password || !username) {
+                toast.error("Please provide all the require fields.");
+                // alert("Please provide both email and password.");
+                return;
+              }
+
             const response = await axios.post("/register", payload, {
                 headers: {
                     "Content-Type": "application/json",
@@ -68,15 +76,17 @@ export default function SignUp(props) {
             console.log(data);
             if (data.message === "Account created successfully...") {
                 // toast.success("Registration successful! Please check your email for OTP verification.");
-                alert("Registration successful! Login to your Account...");
+                toast.success("Registration successful! Login to your Account...");
+                // alert("Registration successful! Login to your Account...");
                 navigate('/auth/login');
             } else {
-                // toast.error(data.error || "Registration failed. Please try again later.");
-                alert("Registration failed. Please try again later.");
+                toast.error("Registration failed. Please try again later." || data.error);
+                // alert("Registration failed. Please try again later.");
             }
         } catch (error) {
             console.error("Error occurred during registration:", error);
-            alert("An error occurred during registration. Please try again later.");
+            toast.error(`Error occurred during registration: ${error}`);
+            // alert("An error occurred during registration. Please try again later.");
         }
     };
 

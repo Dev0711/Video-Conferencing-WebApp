@@ -7,6 +7,7 @@ export const MediaProvider = ({ children }) => {
   const { toggleClicked, handleToggleClick } = useToggle();
 
   const localVideoRef = useRef(null);
+  // const screenVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
 
   const socketRef = useRef(null);
@@ -136,7 +137,7 @@ export const MediaProvider = ({ children }) => {
     <MediaContext.Provider
       value={{
         localVideoRef,
-        remoteVideoRef,
+        // screenVideoRef,
         socketRef,
         deviceRef,
         producerTransportRef,

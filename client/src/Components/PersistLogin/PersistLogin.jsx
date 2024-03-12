@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import useRefreshToken from '../../Hooks/useRefreshToken';
 import useAuth from '../../Hooks/useAuth';
 import Spinner from '../../assets/images/Spinner.gif';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function PersistLogin() {
     const [isLoading, setIsLoading] = useState(true);
@@ -14,7 +16,8 @@ export default function PersistLogin() {
             try {
                 await refresh()
             } catch (err) {
-                console.log(err);
+                // console.log(err);
+                toast.error(err)
             }
             finally {
                 setIsLoading(false)

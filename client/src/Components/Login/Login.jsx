@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import axios from '../../Api/axios';
 import useAuth from '../../Hooks/useAuth';
 
@@ -28,8 +30,8 @@ export default function Login(props) {
 
     // Perform validation (you can add more validation rules as needed)
     if (!email || !password) {
-      // toast.error("Please provide both email and password.");
-      alert("Please provide both email and password.");
+      toast.error("Please provide both email and password.");
+      // alert("Please provide both email and password.");
       return;
     }
 
@@ -97,14 +99,17 @@ export default function Login(props) {
           user: data.user,
         });
     
-        alert("Successfully SignedIn");
+        toast.success("Successfully SignedIn");
+        // alert("Successfully SignedIn");
         navigate(from, { replace: true }); // Redirect to the dashboard page after successful login
       } else {
-        alert("Invalid email or password. Please try again.");
+        toast.error("Invalid email or password. Please try again.");
+        // alert("Invalid email or password. Please try again.");
       }
     } catch (error) {
       console.error("Error occurred during authntiacation:", error);
-      alert("An error occurred during logging in. Please try again later.");
+      toast.error(`Error occurred during authntiacation: ${error}`);
+      // alert("An error occurred during logging in. Please try again later.");
     }
 
   };

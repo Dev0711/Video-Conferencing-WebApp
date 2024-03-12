@@ -545,7 +545,7 @@ async function mediasoupProcess(meetSocket, socket) {
 
     users[meetingId] = users[meetingId].filter(
       (user) => user.socketId !== socket.id
-    );  
+    );    
 
     //? remove socket from room
     rooms[meetingId] = {
