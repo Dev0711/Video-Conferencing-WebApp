@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
-export default function Otp() {
-    const { setAuth } = useAuth();
+export default function OtpVerification() {
+    // const { setAuth } = useAuth();
 
     const otpRef = useRef();
   
@@ -11,6 +11,10 @@ export default function Otp() {
     // const navigate = useNavigate();
     // const location = useLocation();
     // const from = location.state?.from?.pathname || "/";
+
+    const handleOtpVerification = () => {
+        console.log('helo');
+    }
   
     useEffect(() => {
       otpRef.current.focus()
@@ -19,18 +23,18 @@ export default function Otp() {
     return (
       <section className="login-container">
         <form className='flex flex-col items-center gap-5'>
-          <h2>Login</h2>
+          <h2>Verify Otp</h2>
           <div className="input-container">
-            <input type="password"
+            <input type="text"
               placeholder='Enter Otp'
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => setOtp(e.target.value)}
               value={otp}
               ref={otpRef}
               required
             />
           </div>
           <div className="btn__container">
-            <button className="btn join__btn w-full" onClick={handleOtpVerification}> Login </button>
+            <button className="btn join__btn w-full" onClick={handleOtpVerification}> Verify </button>
           </div>
         </form>
       </section>
