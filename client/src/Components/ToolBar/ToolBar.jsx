@@ -12,6 +12,7 @@ import chalkboard from "../../assets/images/chalkboard.svg";
 // import dots from "../../assets/images/dots.svg";
 import useToggle from "../../Hooks/useToggle";
 import useMedia from "../../Hooks/useMedia";
+import useScreenShare from '../../Hooks/useScreenShare';
 
 // export function ToolTip({ text }) {
 //     return ()
@@ -20,9 +21,18 @@ import useMedia from "../../Hooks/useMedia";
 export default function ToolBar() {
     const { toggleClicked, handleToggleClick } = useToggle();
     const { toggleAudio, toggleVideo } = useMedia();
+    const { startScreenShare, stopScreenShare } = useScreenShare()
 
     const navigate = useNavigate()
 
+    const handleScreenShareClick = () => {
+        if (!toggleClicked['screenshare']) {
+            startScreenShare();
+        } 
+        if(toggleClicked['screenshare']) {
+            stopScreenShare();
+        }
+    }
 
     return (
         <>
@@ -37,9 +47,9 @@ export default function ToolBar() {
                     <div title={toggleClicked['audio'] ? 'show video' : 'hide video'} className="video-btn my-2 h-auto w-fit p-2 cursor-pointer" onClick={() => toggleVideo()}>
                         <img className="w-auto lg:h-7" src={toggleClicked['video'] ? video_off : video} alt="" />
                     </div>
-                    {/* <div className="screen-btn my-2 h-auto w-fit p-2 cursor-pointer" onClick={() => handleToggleClick('screenshare')}>
+                    <div className="screen-btn my-2 h-auto w-fit p-2 cursor-pointer" onClick={() => handleScreenShareClick()}>
                         <img className="w-auto lg:h-7" src={!toggleClicked['screenshare'] ? screen_share : screen_share_off} alt="" />
-                    </div> */}
+                    </div>
                     <div title='whiteboard' className="screen-btn my-2 h-auto w-fit p-2 cursor-pointer" onClick={() => handleToggleClick('whiteboard')}>
                         <img className="w-auto lg:h-7" src={chalkboard} alt="" />
                     </div>

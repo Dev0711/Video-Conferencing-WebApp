@@ -6,7 +6,7 @@ const initialState = {
     'sidebar': false,
     'audio': true,
     'video': true,
-    // 'screenshare': false,
+    'screenshare': false,
     'profile': false,
     'whiteboard': false,
 };

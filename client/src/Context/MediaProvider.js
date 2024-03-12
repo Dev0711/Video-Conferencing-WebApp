@@ -7,7 +7,7 @@ export const MediaProvider = ({ children }) => {
   const { toggleClicked, handleToggleClick } = useToggle();
 
   const localVideoRef = useRef(null);
-  // const screenVideoRef = useRef(null);
+  const screenVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
 
   const socketRef = useRef(null);
@@ -117,16 +117,16 @@ export const MediaProvider = ({ children }) => {
 
   const toggleVideo = () => {
     const videoTrack = localVideoRef.current.srcObject.getVideoTracks()[0];
-    videoTrack.enabled = !toggleClicked['video'];
+    videoTrack.enabled = !toggleClicked["video"];
     // setIsVideoPaused(!isVideoPaused);
-    handleToggleClick('video')
+    handleToggleClick("video");
   };
 
   const toggleAudio = () => {
     const audioTrack = localVideoRef.current.srcObject.getAudioTracks()[0];
-    audioTrack.enabled = !toggleClicked['audio'];
+    audioTrack.enabled = !toggleClicked["audio"];
     // setIsAudioPaused(!isAudioPaused);
-    handleToggleClick('audio')
+    handleToggleClick("audio");
   };
 
   useEffect(() => {
@@ -137,7 +137,7 @@ export const MediaProvider = ({ children }) => {
     <MediaContext.Provider
       value={{
         localVideoRef,
-        // screenVideoRef,
+        screenVideoRef,
         socketRef,
         deviceRef,
         producerTransportRef,
@@ -151,6 +151,8 @@ export const MediaProvider = ({ children }) => {
         videoEnabled,
         toggleVideo,
         toggleAudio,
+          // startScreenShare,
+          // stopScreenShare,
         // screenShareToggle,
         chat,
         setChat,

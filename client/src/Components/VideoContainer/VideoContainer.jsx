@@ -19,7 +19,7 @@ export default function VideoContainer() {
     const {
         socketRef,
         localVideoRef,
-        // screenVideoRef,
+        screenVideoRef,
         deviceRef,
         producerTransportRef,
         consumerTransportsRef,
@@ -29,13 +29,11 @@ export default function VideoContainer() {
         videoProducerRef,
     } = useMedia();
 
-    
+
     const { toggleClicked } = useToggle();
-    
+
     const { meetingId } = useParams();
-    
-    // const screenVideoRef = useRef(null);
-    // const getScreenVideoRef = useCallback(() => screenVideoRef, []); 
+
     // let producerTransport;
     // let consumerTransports = [];
 
@@ -128,7 +126,7 @@ export default function VideoContainer() {
                     toast.error(error)
                     if (error.name === "UnsupportedError")
                         console.warn("browser not supported");
-                        toast.warn("browser not supported");
+                    toast.warn("browser not supported");
                 }
             };
 
@@ -457,51 +455,23 @@ export default function VideoContainer() {
         }
     }, [socketRef]);
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        const startScreenShare = async () => {
-            try {
-                const screenStream = await navigator.mediaDevices.getDisplayMedia({
-                    video: true,
-                });
-                if (screenVideoRef.current) {
-                    screenVideoRef.current.srcObject = screenStream;
-                }
-            } catch (error) {
-                alert(error)
-            }
-        }
 
-        const stopScreenShare = () => {
-            const ref = getScreenVideoRef();
-            console.log('hello: ', ref.current);
-            if (ref.current) {
-                console.log(1);
-                const tracks = screenVideoRef.current.getTracks();
-                tracks.forEach(track => track.stop());
-                ref.current.srcObject = null;
-            }
-        };
-
-        if (toggleClicked['screenshare']) {
-            startScreenShare()
-        }if(toggleClicked['screenshare'] == false){
-            stopScreenShare()
-        }
-        return () => {
+        // return () => {
             // Cleanup on component unmount
-            const ref = getScreenVideoRef();
-            console.log('screen: ', ref.current);
-            if (ref.current) {
-                const tracks = screenVideoRef.current.srcObject?.getTracks() || [];
-                tracks.forEach(track => track.stop());
-                ref.current.srcObject = null;
-            }
+            // const ref = getScreenVideoRef();
+            // console.log('screen: ', ref.current);
+            // if (ref.current) {
+            //     const tracks = screenVideoRef.current.srcObject?.getTracks() || [];
+            //     tracks.forEach(track => track.stop());
+            //     ref.current.srcObject = null;
+            // }
             // if(toggleClicked['screenshare'] == false){
             //     stopScreenShare()
             // }
-        };
-    }, [toggleClicked['screenshare'], socketRef]);
+    //     };
+    // }, [toggleClicked['screenshare'], socketRef]);
 
 
     // useEffect(() => {
@@ -511,11 +481,11 @@ export default function VideoContainer() {
     return (
         <section className=' relative my-2 flex flex-col mx-auto bg-[#292b2e] h-[90%] w-[55%] p-3 rounded-md'>
             <video ref={localVideoRef} className={` relative z-10 ${toggleClicked['screenshare'] ? ' w-44 h-[20%] m-2' : 'w-full h-[60%]'}  rounded-md object-cover`} autoPlay muted></video>
-            {/* {toggleClicked['screenshare'] && <video ref={screenVideoRef} className=' absolute mx-auto inset-0 w-[97.3%] mt-3 h-[58.1%] border rounded-md object-cover' autoPlay muted></video>} */}
+            {toggleClicked['screenshare'] && <video ref={screenVideoRef} className=' absolute mx-auto inset-0 w-[97.3%] mt-3 h-[58.1%] border rounded-md object-cover' autoPlay muted></video>}
             {/* <Webcam ref={localVideoRef} /> */}
             {/* {remoteStreams} */}
             <div id="videoContainer" className=' h-full flex gap-1 overflow-auto'></div>
-            { toggleClicked['whiteboard'] && <div className=" absolute z-20 mx-auto top-0 left-0 h-full w-full ">
+            {toggleClicked['whiteboard'] && <div className=" absolute z-20 mx-auto top-0 left-0 h-full w-full ">
                 <Tldraw />
             </div>}
         </section>
