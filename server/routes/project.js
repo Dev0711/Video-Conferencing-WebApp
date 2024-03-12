@@ -41,7 +41,7 @@ router.post('/create-project', async (req, res) => {
 router.get('/projects', async (req, res) => {
 
     try {
-        const { email } = req.body;
+        const { email } = req.query;
 
         console.log(email);
     

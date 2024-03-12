@@ -31,31 +31,31 @@ export function Project({ projects }) {
   );
 }
 
-
 export default function CvsRoute() {
 
-  const [projects, setProject] = useState([])
+  const [projects, setProjects] = useState([])
 
   const { auth } = useAuth();
   const { user } = auth;
 
-  console.log(user.email);
-  useEffect(async () => {
-    const payload = {
-      email: user.email
-    }
-    try {
-      const response = await axios.get("/projects", payload, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      console.log(response);
-    } catch (error) {
-      console.log(error)
-    }
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const payload = { email: user.email };
+        const response = await axios.get("/projects", {
+          params: payload,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        setProjects(response.data); 
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
-  }, [projects]);
+    fetchProjects();
+  }, []);
 
   return (
     <>
