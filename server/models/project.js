@@ -1,22 +1,32 @@
 const mongoose = require('mongoose');
 
 const projectSchema = new mongoose.Schema({
-  username: {
-    type: String,
+  projectId:{
+    type : String ,
     required: true,
-    maxlength: 8,
+    unique : true
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    maxlength: 50,
-  },
-  password: {
+  projectname: {
     type: String,
     required: true,
   },
-  refreshToken: String,
+  projectsummary: {
+    type: String,
+    required: false,
+  },
+  startdate: {
+    type: Date,
+    default: Date.now, // Set the default value to the current date and time
+  },
+  enddate: Date,
+  teammembers: {
+    type: [String], // Array of strings representing team members
+    default: [],    // Default value is an empty array
+  },
+  teamleader : {
+    type: String ,
+    required :true
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Project', projectSchema);

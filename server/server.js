@@ -48,6 +48,7 @@ app.use(require("./routes/logout"));
 // app.use(verifyToken);
 app.use(require("./routes/file"));
 app.use('/files', require("./routes/download"));
+app.use(require("./routes/project"))
 
 //socket.io server
 const socketOptions = {
