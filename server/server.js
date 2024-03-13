@@ -41,7 +41,7 @@ app.use(cors(corsOptions));
 
 app.use(cookieParser());
 
-app.use(require("./routes/register"));
+app.use(require("./routes/register").default);
 app.use(require("./routes/auth"));
 app.use(require("./routes/refresh"));
 app.use(require("./routes/logout"));
