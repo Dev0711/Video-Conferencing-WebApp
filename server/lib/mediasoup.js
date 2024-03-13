@@ -27,9 +27,6 @@ const mediaCodecs = [
       "x-google-start-bitrate": 1000,
     },
   },
-];
-
-const screenSharingCodecs = [
   {
     kind: "video",
     mimeType: "video/VP8",
@@ -41,6 +38,19 @@ const screenSharingCodecs = [
     },
   },
 ];
+
+// const screenSharingCodecs = [
+//   {
+//     kind: "video",
+//     mimeType: "video/VP8",
+//     payloadType: 96, 
+//     clockRate: 90000,
+//     channels: 1,
+//     parameters: {
+//       "x-google-start-bitrate": 1000,
+//     },
+//   },
+// ];
 
 const createWorker = async () => {
   const worker = await mediasoup.createWorker({
@@ -184,7 +194,7 @@ async function mediasoupProcess(meetSocket, socket) {
   };
 
   //? To create a WebRtcTransport for created router..
-  const createWebRtcTransport = async (router, enableSctp) => {
+  const createWebRtcTransport = async (router) => {
     return new Promise(async (resolve, reject) => {
       try {
         //? https://mediasoup.org/documentation/v3/mediasoup/api/#WebRtcTransportOptions
@@ -198,7 +208,6 @@ async function mediasoupProcess(meetSocket, socket) {
           enableUdp: true,
           enableTcp: true,
           preferUdp: true,
-          enableSctp,
         };
 
         //? https://mediasoup.org/documentation/v3/mediasoup/api/#router-createWebRtcTransport
@@ -223,10 +232,6 @@ async function mediasoupProcess(meetSocket, socket) {
       }
     });
   };
-
-  // const createScreenSharingTransport = async (router) => {
-  //   return createWebRtcTransport(router, true);
-  // };
 
   //? Listen for joining room event..
   socket.on("joinRoom", async ({ meetingId, user }, callback) => {

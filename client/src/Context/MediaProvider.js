@@ -39,12 +39,15 @@ export const MediaProvider = ({ children }) => {
 
   const audioParamsRef = useRef(null);
   const videoParamsRef = useRef({ params });
+  const screenShareParamsRef = useRef({ params });
   const deviceRef = useRef(null);
   const producerTransportRef = useRef(null);
+  const screenProducerTransportRef = useRef(null);
   const consumerTransportsRef = useRef([]);
 
   const audioProducerRef = useRef(null);
   const videoProducerRef = useRef(null);
+  const screenShareProducerRef = useRef(null);
 
   let audioEnabled;
   let videoEnabled;
@@ -136,23 +139,25 @@ export const MediaProvider = ({ children }) => {
   return (
     <MediaContext.Provider
       value={{
+        params,
         localVideoRef,
         screenVideoRef,
         socketRef,
         deviceRef,
         producerTransportRef,
+        screenProducerTransportRef,
         consumerTransportsRef,
         audioProducerRef,
         videoProducerRef,
+        screenShareProducerRef,
         params,
         audioParamsRef,
         videoParamsRef,
+        screenShareParamsRef,
         audioEnabled,
         videoEnabled,
         toggleVideo,
         toggleAudio,
-          // startScreenShare,
-          // stopScreenShare,
         // screenShareToggle,
         chat,
         setChat,

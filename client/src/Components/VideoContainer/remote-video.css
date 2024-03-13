@@ -2,4 +2,5 @@
     width: 20rem;
     margin-block: .5rem;
     border-radius: 2px;
+    border: 2px solid red;
 }
