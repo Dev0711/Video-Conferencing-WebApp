@@ -83,8 +83,16 @@ export default function SignUp(props) {
                 // alert("Registration failed. Please try again later.");
             }
         } catch (error) {
-            console.error("Error occurred during registration:", error);
-            toast.error(`Error occurred during registration: ${error}`);
+            if (error.response && error.response.status === 422) {
+                // Display the error message as it is
+                toast.error(error.response.data.error);
+            } else {
+                // Handle other errors
+                console.error("Error occurred during registration:", error);
+                toast.error("An error occurred during registration. Please try again later.");
+            }
+            // console.error("Error occurred during registration:", error);
+            // toast.error(`Error occurred during registration: ${error}`);
             // alert("An error occurred during registration. Please try again later.");
         }
     };

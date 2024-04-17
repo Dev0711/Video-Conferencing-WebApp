@@ -108,7 +108,7 @@ export default function Login(props) {
       }
     } catch (error) {
       // console.error("Error occurred during authntiacation:", error);
-      if (error.response.status === 422) {
+      if (error?.response?.status === 422) {
         toast.error(error.response.data.error);
       } else {
         toast.error('An error occurred. Please try again later.');
