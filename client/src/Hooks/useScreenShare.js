@@ -7,30 +7,15 @@ const useScreenShare = () => {
     params,
     screenVideoRef,
     screenShareProducerRef,
-    screenProducerTransportRef,
+    // screenProducerTransportRef,
     screenShareParamsRef,
+    producerTransportRef,
     socketRef,
-    deviceRef,
+    // deviceRef,
   } = useMedia();
   const { handleToggleClick } = useToggle();
   const { getProducers } = useVideoFunctions();
 
-  //   const startScreenShare = async () => {
-  //     try {
-  //       handleToggleClick("screenshare");
-  //       const screenStream = await navigator.mediaDevices.getDisplayMedia({
-  //         video: true,
-  //       });
-  //       if (screenVideoRef.current) {
-  //       }
-  //       screenVideoRef.current.srcObject = screenStream;
-  //     } catch (error) {
-  //       alert(error);
-  //     }
-  //     if (socketRef.current) {
-  //         createScreenSendTransport()
-  //     }
-  //   };
   const startScreenShare = async () => {
     try {
       handleToggleClick("screenshare");
@@ -50,7 +35,8 @@ const useScreenShare = () => {
         };
 
         if (socketRef.current) {
-          createScreenSendTransport();
+          // createScreenSendTransport();
+          await connectScreenSendTransport();
         }
       } else {
         throw new Error("No tracks found in screen sharing stream");
@@ -61,9 +47,21 @@ const useScreenShare = () => {
     }
   };
 
-  const stopScreenShare = () => {
+  const stopScreenShare = async () => {
     // const ref = getScreenVideoRef();
     // console.log('hello: ', ref.current);
+
+    if (screenShareProducerRef.current) {
+      const screenProducerId = screenShareProducerRef.current.id;
+      await screenShareProducerRef.current.close();
+      console.log("Screen sharing producer closed");
+      screenShareProducerRef.current = null;
+      console.log(screenProducerId);
+      socketRef.current.emit("producer-close", {
+        remoteProducerId: screenProducerId,
+      });
+    }
+
     if (screenVideoRef.current) {
       const stream = screenVideoRef.current.srcObject;
       if (stream && stream instanceof MediaStream) {
@@ -73,92 +71,6 @@ const useScreenShare = () => {
         handleToggleClick("screenshare");
       }
     }
-  };
-
-  const createScreenSendTransport = () => {
-    // This is a call from Producer, so sender = true
-    socketRef.current.emit(
-      "createWebRtcTransport",
-      { consumer: true },
-      async ({ params }) => {
-        // Check if there's an error in params
-        if (params.error) {
-          console.log(params.error);
-          return;
-        }
-
-        console.log("Params got from the server: ", params);
-
-        // Create a new WebRTC Transport to send screen sharing media
-        screenProducerTransportRef.current = deviceRef.current.createSendTransport(
-          params
-        );
-        console.log(
-          "Created producer transport: ",
-          screenProducerTransportRef.current
-        );
-
-        // Handle 'connect' event for the producer transport
-        screenProducerTransportRef.current.on(
-          "connect",
-          async ({ dtlsParameters }, callback, errback) => {
-            console.log("Inside producer connect.");
-            try {
-              // Signal local DTLS parameters to the server side transport
-              await socketRef.current.emit("transport-connect", {
-                dtlsParameters,
-              });
-
-              // Tell the transport that parameters were transmitted
-              callback();
-            } catch (error) {
-              errback(error);
-            }
-          }
-        );
-
-        // Handle 'produce' event for the producer transport
-        screenProducerTransportRef.current.on(
-          "produce",
-          async (parameters, callback, errback) => {
-            console.log("Inside producer produce.");
-            console.log(
-              "Parameters inside screenProducerTransportRef.current.produce: ",
-              parameters
-            );
-            console.log(
-              "rtpParameters inside screenProducerTransportRef.current.produce: ",
-              parameters.rtpParameters
-            );
-
-            try {
-              // Tell the server to create a Producer for screen sharing
-              // and expect back a server side producer id
-              await socketRef.current.emit(
-                "transport-produce",
-                {
-                  kind: parameters.kind,
-                  rtpParameters: parameters.rtpParameters,
-                  appData: parameters.appData,
-                },
-                ({ id, producersExist }) => {
-                  // Tell the transport that parameters were transmitted
-                  // and provide it with the server side producer's id
-                  callback({ id });
-
-                  // If producers exist, then join room
-                  if (producersExist) getProducers();
-                }
-              );
-            } catch (error) {
-              errback(error);
-            }
-          }
-        );
-
-        if (socketRef.current) connectScreenSendTransport();
-      }
-    );
   };
 
   const connectScreenSendTransport = async () => {
@@ -172,13 +84,13 @@ const useScreenShare = () => {
         throw new Error("Missing track for screen sharing");
       }
       // Produce screen sharing media
-      screenShareProducerRef.current = await screenProducerTransportRef.current.produce(
+      screenShareProducerRef.current = await producerTransportRef.current.produce(
         screenShareParamsRef.current
       );
-      console.log(
-        "screenShareProducerRef.current: ",
-        screenShareProducerRef.current
-      );
+      // console.log(
+      //   "screenShareProducerRef.current: ",
+      //   screenShareProducerRef.current
+      // );
 
       // Add event listeners for screen sharing track and transport
       screenShareProducerRef.current.on("trackended", () => {

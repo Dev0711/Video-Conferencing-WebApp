@@ -29,7 +29,9 @@ router.post("/auth", (req, res) => {
           const { _id, username, email } = savedUser;
 
           // saving the user with refreshToken
+          // console.log(refreshToken);
           savedUser.refreshToken = refreshToken;
+          // console.log(savedUser.refreshToken);
           const result = await savedUser.save();
           // console.log(result);
           

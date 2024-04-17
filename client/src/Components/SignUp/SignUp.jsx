@@ -8,9 +8,6 @@ export default function SignUp(props) {
     const [username, setUserName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [otp, setOtp] = useState("");  // Add state for OTP
-    const [showOtpInput, setShowOtpInput] = useState(false);  // Track whether to show OTP input
-    const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
     const navigate = useNavigate()
 
@@ -77,10 +74,10 @@ export default function SignUp(props) {
 
             // Handle the response from the server
             console.log(data);
-            if (data.message === 'Account created successfully...') {
+            if (data.message === 'Account created successfully. OTP sent to your email.') {
                 toast.success('Registration successful! Please check your email for OTP verification.');
-                setShowOtpInput(true);
-                navigate('/auth/login');
+                // setShowOtpInput(true);
+                navigate('/auth/verifyotp', { state: { email } });
             } else {
                 toast.error("Registration failed. Please try again later." || data.error);
                 // alert("Registration failed. Please try again later.");
@@ -89,28 +86,6 @@ export default function SignUp(props) {
             console.error("Error occurred during registration:", error);
             toast.error(`Error occurred during registration: ${error}`);
             // alert("An error occurred during registration. Please try again later.");
-        }
-    };
-
-    const handleOtpVerification = async () => {
-        try {
-            const response = await axios.post('/verify-otp', { otp }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            const data = response.data;
-
-            if (data.success) {
-                setRegistrationSuccess(true);
-                toast.success('User created successfully!');
-            } else {
-                toast.error('OTP verification failed. Please try again.');
-            }
-        } catch (error) {
-            console.error('Error occurred during OTP verification:', error);
-            toast.error(`Error occurred during OTP verification: ${error}`);
         }
     };
 

@@ -41,11 +41,12 @@ app.use(cors(corsOptions));
 
 app.use(cookieParser());
 
-app.use(require("./routes/register").default);
+app.use(require("./routes/register"));
+app.use(require("./routes/verify_otp"));
 app.use(require("./routes/auth"));
 app.use(require("./routes/refresh"));
 app.use(require("./routes/logout"));
-// app.use(verifyToken);
+app.use(verifyToken);
 app.use(require("./routes/file"));
 app.use('/files', require("./routes/download"));
 app.use(require("./routes/project"))

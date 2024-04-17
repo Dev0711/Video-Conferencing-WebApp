@@ -12,6 +12,7 @@ const useVideoFunctions = () => {
         videoParamsRef,
         audioProducerRef,
         videoProducerRef,
+        isScreenSharing,
     } = useMedia();
 
     const { meetingId } = useParams();
@@ -21,7 +22,7 @@ const useVideoFunctions = () => {
     const createSendTransport = () => {
         socketRef.current.emit(
             "createWebRtcTransport",
-            { consumer: false },
+            { consumer: false, isScreenSharing: false },
             ({ params }) => {
                 if (params.error) {
                     console.log(params.error);
@@ -98,7 +99,7 @@ const useVideoFunctions = () => {
 
         await socketRef.current.emit(
             "createWebRtcTransport",
-            { consumer: true },
+            { consumer: true, isScreenSharing: false },
             ({ params }) => {
                 if (params.error) {
                     console.log(params.error);
@@ -135,6 +136,7 @@ const useVideoFunctions = () => {
 
     const getProducers = () => {
         socketRef.current.emit("getProducers", (producerIds) => {
+            console.log('getProducers emitted');
             producerIds.forEach((producerId) => signalNewConsumerTransport(producerId));
         });
     };
@@ -150,6 +152,7 @@ const useVideoFunctions = () => {
                 rtpCapabilities: deviceRef.current.rtpCapabilities,
                 remoteProducerId,
                 serverConsumerTransportId,
+                isScreenSharing,
             },
             async ({ params }) => {
                 if (params.error) {

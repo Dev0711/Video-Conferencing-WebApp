@@ -156,7 +156,8 @@ async function mediasoupProcess(meetSocket, socket) {
   const addConsumer = (consumer, meetingId) => {
     // add the consumer to the consumers list
     consumers = [...consumers, { socketId: socket.id, consumer, meetingId }];
-
+    
+    console.log('consumer added');
     // add the consumer id to the peers list
     peers[socket.id] = {
       ...peers[socket.id],
@@ -292,7 +293,7 @@ async function mediasoupProcess(meetSocket, socket) {
     meetSocket.to(meetingId).emit('joined-users', { users: users[meetingId] } )
   })
 
-  socket.on("createWebRtcTransport", async ({ consumer }, callback) => {
+  socket.on("createWebRtcTransport", async ({ consumer, isScreenSharing }, callback) => {
     // get Room Name from Peer's properties
     const meetingId = peers[socket.id].meetingId;
 
@@ -396,7 +397,7 @@ async function mediasoupProcess(meetSocket, socket) {
   socket.on(
     "consume",
     async (
-      { rtpCapabilities, remoteProducerId, serverConsumerTransportId },
+      { rtpCapabilities, remoteProducerId, serverConsumerTransportId, isScreenSharing },
       callback
     ) => {
       try {
@@ -422,6 +423,8 @@ async function mediasoupProcess(meetSocket, socket) {
             rtpCapabilities,
             paused: true,
           });
+
+          console.log('consumer -> ', consumer);
 
           consumer.on("transportclose", () => {
             console.log("transport close from consumer");
@@ -477,59 +480,6 @@ async function mediasoupProcess(meetSocket, socket) {
 
     // console.log(rooms[meetingId]?.peers);
   });
-
-  // socket.on("screenShareToggle", async ({ enabled }) => {
-
-  //   console.log('screenShareToggel listened...');
-
-  //   const { meetingId } = peers[socket.id];
-
-  //   // Notify other peers in the meeting about screen sharing toggle
-  //   socket
-  //     .to(meetingId)
-  //     .emit("screenShareToggle", { socketId: socket.id, enabled });
-
-  //   // If screen sharing is enabled, create a new producer for the screen
-  //   if (enabled) {
-  //     const router = rooms[meetingId].router;
-  //     const screenTransport = await createScreenSharingTransport(router);
-
-  //     const screenProducer = await screenTransport.produce({
-  //       kind: "video",
-  //       rtpParameters: {
-  //         mid: "1",
-  //         codecs: screenSharingCodecs, // Only VP8 for screen sharing
-  //         encodings: [{ rid: "r0", maxBitrate: 100000 }],
-  //         codecOptions: { videoGoogleStartBitrate: 1000 },
-  //       },
-  //       codecOptions: {
-  //         videoGoogleStartBitrate: 1000,
-  //       },
-  //     });
-
-  //     addTransport(screenTransport, meetingId, true);
-
-  //     addProducer(screenProducer, meetingId);
-
-  //     informConsumers(meetingId, socket.id, screenProducer.id);
-  //   }
-  //   // If screen sharing is disabled, close the screen producer and transport
-  //   else {
-  //     const screenProducer = producers.find(
-  //       (producer) =>
-  //         producer.socketId === socket.id && producer.kind === "video"
-  //     );
-  //     if (screenProducer) {
-  //       const screenTransport = transports.find(
-  //         (transport) => transport.socketId === socket.id && transport.consumer
-  //       );
-  //       if (screenTransport) {
-  //         screenTransport.transport.close();
-  //       }
-  //       screenProducer.producer.close();
-  //     }
-  //   }
-  // });
 
   //? Listen for the disconnect event..
   socket.on("disconnect", () => {

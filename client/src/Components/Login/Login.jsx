@@ -107,9 +107,12 @@ export default function Login(props) {
         // alert("Invalid email or password. Please try again.");
       }
     } catch (error) {
-      console.error("Error occurred during authntiacation:", error);
-      toast.error(`Error occurred during authntiacation: ${error}`);
-      // alert("An error occurred during logging in. Please try again later.");
+      // console.error("Error occurred during authntiacation:", error);
+      if (error.response.status === 422) {
+        toast.error(error.response.data.error);
+      } else {
+        toast.error('An error occurred. Please try again later.');
+      }
     }
 
   };

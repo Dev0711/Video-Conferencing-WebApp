@@ -42,7 +42,6 @@ export const MediaProvider = ({ children }) => {
   const screenShareParamsRef = useRef({ params });
   const deviceRef = useRef(null);
   const producerTransportRef = useRef(null);
-  const screenProducerTransportRef = useRef(null);
   const consumerTransportsRef = useRef([]);
 
   const audioProducerRef = useRef(null);
@@ -51,72 +50,10 @@ export const MediaProvider = ({ children }) => {
 
   let audioEnabled;
   let videoEnabled;
+  const [isScreenSharing, setIsScreenSharing] = useState(false);
 
   const [chat, setChat] = useState([]);
   const [people, setPeople] = useState([]);
-
-  //   let screenMediaPromise;
-
-  //   if (!toggleClicked["screenshare"]) {
-  //     // Start screen sharing
-  //     screenMediaPromise = navigator.mediaDevices.getDisplayMedia({
-  //       video: true,
-  //     });
-  //   } else {
-  //     // Stop screen sharing
-  //     screenMediaPromise = navigator.mediaDevices.getUserMedia({ video: true });
-  //   }
-
-  //   screenMediaPromise
-  //     .then(async (screenStream) => {
-  //       handleToggleClick("screenshare");
-  //       console.log("screenStream: ", screenStream);
-
-  //       // Replace video track in your existing producers
-  //       if (audioProducerRef.current && videoProducerRef.current) {
-  //         // audioParamsRef.current = {
-  //         //   track: screenStream.getAudioTracks()[0],
-  //         //   ...audioParamsRef.current,
-  //         // };
-  //         // videoParamsRef.current = {
-  //         //   track: screenStream.getVideoTracks()[0],
-  //         //   ...videoParamsRef.current,
-  //         // };
-  //         if (screenStream.getAudioTracks().length > 0) {
-  //           audioProducerRef.current.replaceTrack(screenStream.getAudioTracks()[0]);
-  //         }
-
-  //         if (screenStream.getVideoTracks().length > 0) {
-  //           videoProducerRef.current.replaceTrack(screenStream.getVideoTracks()[0]);
-  //         }
-  //       }
-
-  //       console.log("audioProducerRef.current -> ", audioProducerRef.current);
-  //       console.log("videoProducerRef.current -> ", videoProducerRef.current);
-
-  //       // Update your local video element
-  //       if (localVideoRef.current) {
-  //         localVideoRef.current.srcObject = screenStream;
-  //       }
-
-  //       // Handle other necessary UI updates
-
-  //       // Handle ending of screen sharing
-  //       screenStream.getVideoTracks()[0].onended = function () {
-  //         if (toggleClicked["screenshare"]) {
-  //           screenShareToggle();
-  //         }
-  //       };
-
-  //       // console.log( ' \n \n \n  screenShare -> \n \n \n ' , toggleClicked["screenshare"]);
-
-  //       socketRef.current.emit("screenShareToggle", { enabled: true });
-  //     })
-  //     .catch((error) => {
-  //       alert("Unable to share screen: " + error.message);
-  //       console.error(error);
-  //     });
-  // }
 
   const toggleVideo = () => {
     const videoTrack = localVideoRef.current.srcObject.getVideoTracks()[0];
@@ -145,7 +82,6 @@ export const MediaProvider = ({ children }) => {
         socketRef,
         deviceRef,
         producerTransportRef,
-        screenProducerTransportRef,
         consumerTransportsRef,
         audioProducerRef,
         videoProducerRef,
@@ -158,6 +94,8 @@ export const MediaProvider = ({ children }) => {
         videoEnabled,
         toggleVideo,
         toggleAudio,
+        isScreenSharing,
+        setIsScreenSharing,
         // screenShareToggle,
         chat,
         setChat,
