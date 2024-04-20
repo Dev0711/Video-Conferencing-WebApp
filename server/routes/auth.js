@@ -1,4 +1,4 @@
-const router = require('express').Router();
+const router = require("express").Router();
 const User = require("../models/user");
 
 const bcrypt = require("bcryptjs");
@@ -24,8 +24,16 @@ router.post("/auth", (req, res) => {
       bcrypt.compare(password, savedUser.password).then(async (doMatch) => {
         if (doMatch) {
           // Password is correct, generate a JWT token for successful signin
-          const accessToken = jwt.sign({ _id: savedUser._id.toString() }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '5m' });
-          const refreshToken = jwt.sign({ _id: savedUser._id.toString() }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '1d' });
+          const accessToken = jwt.sign(
+            { _id: savedUser._id.toString() },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: "5m" }
+          );
+          const refreshToken = jwt.sign(
+            { _id: savedUser._id.toString() },
+            process.env.REFRESH_TOKEN_SECRET,
+            { expiresIn: "1d" }
+          );
           const { _id, username, email } = savedUser;
 
           // saving the user with refreshToken
@@ -34,8 +42,13 @@ router.post("/auth", (req, res) => {
           // console.log(savedUser.refreshToken);
           const result = await savedUser.save();
           // console.log(result);
-          
-          res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24*60*60*1000, sameSite: 'none', secure: true }) //secure: true
+
+          res.cookie("jwt", refreshToken, {
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000,
+            sameSite: "none",
+            secure: true,
+          }); //secure: true
           res.json({
             accessToken,
             refreshToken,

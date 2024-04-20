@@ -12,6 +12,7 @@ export default function Login(props) {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isDisabled, setIsDisabled] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -83,6 +84,8 @@ export default function Login(props) {
     //   });
 
     try {
+      setIsDisabled((prev) => prev = true)
+
       const response = await axios.post("/auth", payload, {
         headers: {
           "Content-Type": "application/json",
@@ -113,6 +116,7 @@ export default function Login(props) {
       } else {
         toast.error('An error occurred. Please try again later.');
       }
+      setIsDisabled((prev) => prev = false)
     }
 
   };
@@ -138,7 +142,7 @@ export default function Login(props) {
           />
         </div>
         <div className="btn__container">
-          <button className="btn join__btn w-full" onClick={handleLogin}> Login </button>
+          <button className="btn join__btn w-full" onClick={handleLogin} disabled={isDisabled}> Login </button>
         </div>
         <h4>Don't have an account? <span className='cursor-pointer text-blue-400' onClick={handleAuthRouteClick}>register</span></h4>
       </form>

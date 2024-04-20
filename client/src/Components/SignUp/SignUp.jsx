@@ -8,6 +8,7 @@ export default function SignUp(props) {
     const [username, setUserName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [isDisabled, setIsDisabled] = useState(false);
 
     const navigate = useNavigate()
 
@@ -58,6 +59,8 @@ export default function SignUp(props) {
         // }
         
         try {
+            setIsDisabled((prev) => prev = true)
+            
             if (!email || !password || !username) {
                 toast.error("Please provide all the require fields.");
                 // alert("Please provide both email and password.");
@@ -91,6 +94,8 @@ export default function SignUp(props) {
                 console.error("Error occurred during registration:", error);
                 toast.error("An error occurred during registration. Please try again later.");
             }
+
+            setIsDisabled((prev) => prev = false)
             // console.error("Error occurred during registration:", error);
             // toast.error(`Error occurred during registration: ${error}`);
             // alert("An error occurred during registration. Please try again later.");
@@ -109,7 +114,7 @@ export default function SignUp(props) {
                         <input type="password" name="password" placeholder='Enter password' onChange={(e) => setPassword(e.target.value)} required />
                     </div>
                     <div className="btn__container">
-                        <button className="btn join__btn w-full" onClick={handleSignup}> Sign Up </button>
+                        <button className="btn join__btn w-full" onClick={handleSignup} disabled={isDisabled}> Sign Up </button>
                     </div>
                     <h4>Already have an account? <span className='cursor-pointer text-blue-400' onClick={handleAuthRouteClick}>sign in</span></h4>
                 </form>
