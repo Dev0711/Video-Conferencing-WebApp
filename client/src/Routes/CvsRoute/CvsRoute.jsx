@@ -7,6 +7,7 @@ import axios from "../../Api/axios";
 
 export function Project({ projects }) {
   const navigate = useNavigate();
+  console.log(projects);
   return (
     <>
       <section className=' flex flex-col gap-2 justify-center h-auto m-4 px-3 py-2 rounded-md bg-white w-fit mx-auto'>
@@ -14,14 +15,13 @@ export function Project({ projects }) {
           projects.map((project, index) => (
             <div
               key={index}
-              style={{ backgroundColor: project.bgColor }}
-              className=' cursor-pointer relative text-white h-52 w-[39rem] rounded-md p-2'
-              onClick={() => navigate(`/office/${project.id}/`, {
-                state: project.id,
+              className=' cursor-pointer relative bg-yellow-300 h-52 w-[39rem] rounded-md p-2'
+              onClick={() => navigate(`/office/${project._id}/`, {
+                state: {project: project},
               })}
             >
-              {project.name}
-              <span className=' absolute bottom-0 right-2'>{project.author}</span>
+              {project.projectname}
+              <span className=' absolute bottom-0 right-2'>{project.teamleader}</span>
             </div>
           ))
         }
@@ -48,7 +48,9 @@ export default function CvsRoute() {
             "Content-Type": "application/json",
           },
         });
-        setProjects(response.data); 
+        // console.log(response.data);
+        setProjects(response.data.projects);
+ 
       } catch (error) {
         console.log(error);
       }

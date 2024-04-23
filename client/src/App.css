@@ -51,6 +51,11 @@ input:focus {
   cursor: pointer;
 }
 
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .form-section{
   display: flex;
   align-items: center;

@@ -2,41 +2,22 @@ import React from "react";
 import { GridComponent, ColumnsDirective, ColumnDirective, Page, Inject } from '@syncfusion/ej2-react-grids';
 import Avatar from "react-avatar";
 
-export default function CvsDashBoard() {
+export default function CvsDashBoard({ project }) {
   // Replace the following with actual user data
+  console.log(project);
 
   const universityUsers = [
     {
-      username: "jaydeep Khandla",
+      username: "jd-work",
       email: "jaydeepkhandla1@gmail.com",
     },
     {
-      username: "Dev Oza",
-      email: "devoza007@gmail.com",
+      username: "dev03",
+      email: "devoza03@gmail.com",
     },
     {
       username: "Harsh Sonaiya",
-      email: "harsh@gmail.com",
-    },
-    {
-      username: "Arun Kumar",
-      email: "arunjetli@gmail.com",
-    },
-    {
-      username: "Raj Kumar",
-      email: "rajkumar@gmail.com",
-    },
-    {
-      username: "Saurabh Gandhi",
-      email: "saurabhgandhi@gmail.com",
-    },
-    {
-      username: "Gaurav Tiwari",
-      email: "gaurav@gmail.com",
-    },
-    {
-      username: "Mit Patel",
-      email: "mit@gmail.com",
+      email: "sonaiya98@gmail.com",
     },
   
     // Add more user data as needed

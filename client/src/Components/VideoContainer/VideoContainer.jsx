@@ -157,12 +157,12 @@ export default function VideoContainer() {
 
     return (
         <section className=' relative my-2 flex flex-col mx-auto bg-[#292b2e] h-[90%] w-[55%] p-3 rounded-md'>
-            <video ref={localVideoRef} className={` border-red relative z-10 ${toggleClicked['screenshare'] ? ' w-44 h-[20%] m-2' : 'w-full h-[60%]'}  rounded-md object-cover`} autoPlay muted></video>
-            {toggleClicked['screenshare'] && <video ref={screenVideoRef} className=' border-red absolute mx-auto inset-0 w-[97.3%] mt-3 h-[58.1%] rounded-lg object-cover' autoPlay muted></video>}
+            <video ref={localVideoRef} className={` relative z-10 ${toggleClicked['screenshare'] ? ' w-44 h-[20%] m-2' : 'w-full h-[60%]'}  rounded-md object-cover`} autoPlay muted></video>
+            {toggleClicked['screenshare'] && <video ref={screenVideoRef} className=' absolute mx-auto inset-0 w-[97.3%] mt-3 h-[58.1%] rounded-lg object-cover' autoPlay muted></video>}
             {/* <Webcam ref={localVideoRef} /> */}
             {/* {remoteStreams} */}
             <div className="flex-grow"></div> 
-            <div id="videoContainer" className=' relative bottom-0 h-[40%] flex gap-1 border-red overflow-y-auto'></div>
+            <div id="videoContainer" className=' relative bottom-0 h-[40%] flex gap-1 overflow-y-auto'></div>
             {toggleClicked['whiteboard'] && <div className=" absolute z-20 mx-auto top-0 left-0 h-full w-full ">
                 <Tldraw />
             </div>}

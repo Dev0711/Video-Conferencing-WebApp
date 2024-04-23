@@ -8,13 +8,15 @@ import useToggle from '../../Hooks/useToggle';
 export default function ProfileCard() {
 
     const navigate = useNavigate();
-    const { auth } = useAuth();
+    const { auth, setAuth } = useAuth();
     const logout = useLogout();
     const {handleToggleClick} = useToggle();
 
     const signOut = async () => {
         await logout()
         handleToggleClick('profile')
+
+        setAuth(() => {return null});
 
         navigate('/')
     }

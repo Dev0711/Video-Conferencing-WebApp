@@ -42,10 +42,10 @@ export default function ToolBar() {
                         <img className="w-auto lg:h-7 -rotate-225" src={phone} alt="" />
                     </div>
                     <div title={toggleClicked['audio'] ? 'mute audio' : 'unmute audio'} className="mic-btn my-2 h-auto w-fit p-2 cursor-pointer" onClick={() => toggleAudio()} >
-                        <img className="w-auto lg:h-7" src={toggleClicked['audio'] ? microphone_off : microphone} alt="" />
+                        <img className="w-auto lg:h-7" src={toggleClicked['audio'] ? microphone : microphone_off} alt="" />
                     </div>
                     <div title={toggleClicked['audio'] ? 'show video' : 'hide video'} className="video-btn my-2 h-auto w-fit p-2 cursor-pointer" onClick={() => toggleVideo()}>
-                        <img className="w-auto lg:h-7" src={toggleClicked['video'] ? video_off : video} alt="" />
+                        <img className="w-auto lg:h-7" src={toggleClicked['video'] ? video : video_off} alt="" />
                     </div>
                     <div className="screen-btn my-2 h-auto w-fit p-2 cursor-pointer" onClick={() => handleScreenShareClick()}>
                         <img className="w-auto lg:h-7" src={!toggleClicked['screenshare'] ? screen_share : screen_share_off} alt="" />

@@ -28,6 +28,8 @@ async function sendOTPEmail(email, otp) {
     },
   });
 
+  console.log(`${email}: ${otp}`);
+
   const mailOptions = {
     from: "harshsonaiya09@gmail.com", // sender address
     to: email, // list of receivers

@@ -123,11 +123,11 @@ export default function CvsChat() {
                                 <span
                                     className="flex items-center justify-center bg-gray-300 h-4 w-4 rounded-full"
                                 >
-                                    8
+                                    3
                                 </span>
                             </div>
                             <div className="flex flex-col space-y-1 mt-4 -mx-2 h-48 overflow-y-auto">
-                                {["Jaydeep Khandla", "Dev Oza", "Arun Kumar", "Harsh Sonaiya", "Raj Kumar", "Saurabh Gandhi", "Gaurav Tiwari", "Mit Patel"].map((member, index) => (
+                                {["Jd-work", "dev03", "Harsh Sonaiya"].map((member, index) => (
                                     <button
                                         key={index}
                                         className="flex flex-row items-center hover:bg-gray-100 rounded-xl p-2"

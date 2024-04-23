@@ -12,14 +12,17 @@ import PersistLogin from "./Components/PersistLogin/PersistLogin";
 import { MediaProvider } from "./Context/MediaProvider";
 import CvsRoute from "./Routes/CvsRoute/CvsRoute";
 import ProjectInvitation from "./Routes/CvsRoute/ProjectInvitation/ProjectInvitaion";
+import DeniedRoute from "./Components/DeniedRoute/DeniedRoute";
 
 function App() {
   return (
     <>
-          <ToastContainer />
+      <ToastContainer />
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route path="/auth/*" element={<Auth />} />
+          <Route element={<DeniedRoute />}>
+            <Route path="/auth/*" element={<Auth />} />
+          </Route>
 
           <Route element={<PersistLogin />}>
             <Route path="/" element={<Home />} />
