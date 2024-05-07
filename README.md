@@ -25,5 +25,6 @@ This project is a video-conferencing web application designed to facilitate seam
 This project is actively maintained and developed, with ongoing efforts to enhance its features and capabilities. Future updates may include additional functionalities, optimizations, and improvements based on user feedback and evolving requirements.
 
 ## Social
+### Jaydeep Khandla
 - **LinkedIn**: [Jaydeep-Khandla](https://www.linkedin.com/in/jaydeep-khandla)
 - **GitHub**: [jd_io](https://leetcode.com/u/jd_io/)
