@@ -28,3 +28,5 @@ This project is actively maintained and developed, with ongoing efforts to enhan
 ### Jaydeep Khandla
 - **LinkedIn**: [Jaydeep-Khandla](https://www.linkedin.com/in/jaydeep-khandla)
 - **Leetcode**: [jd_io](https://leetcode.com/u/jd_io/)
+### Dev Oza
+- **LinkedIn**: [Dev Oza](http://www.linkedin.com/in/dev-oza-a88134244)
