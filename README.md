@@ -27,4 +27,4 @@ This project is actively maintained and developed, with ongoing efforts to enhan
 ## Social
 ### Jaydeep Khandla
 - **LinkedIn**: [Jaydeep-Khandla](https://www.linkedin.com/in/jaydeep-khandla)
-- **GitHub**: [jd_io](https://leetcode.com/u/jd_io/)
+- **Leetcode**: [jd_io](https://leetcode.com/u/jd_io/)
