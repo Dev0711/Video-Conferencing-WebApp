@@ -43,10 +43,3 @@ export default function PersistLogin() {
         </>
     );
 }
-
-{/* <p>Loading</p> */ }
-{/* <img
-src={Spinner}
-className=' w-10 mx-auto block text-white'
-alt="Loading..."
-/> */}

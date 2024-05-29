@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useState } from 'react';
 import useMedia from './useMedia';
 import { useParams } from 'react-router-dom';
 
@@ -16,6 +16,8 @@ const useVideoFunctions = () => {
     } = useMedia();
 
     const { meetingId } = useParams();
+
+    const [consumers, setConsumers] = useState([]);
 
     let consumingTransports = [];
 
@@ -176,21 +178,28 @@ const useVideoFunctions = () => {
                         consumer,
                     },
                 ];
+                
+                setConsumers((prevConsumers) => [
+                    ...prevConsumers,
+                    {
+                      remoteProducerId,
+                      track: consumer.track,
+                      kind: params.kind,
+                    },
+                  ]);
+                // const newElem = document.createElement("div");
+                // newElem.setAttribute("id", `td-${remoteProducerId}`);
 
-                const newElem = document.createElement("div");
-                newElem.setAttribute("id", `td-${remoteProducerId}`);
+                // if (params.kind == "audio") {
+                //     newElem.innerHTML = '<audio id="' + remoteProducerId + '" autoplay></audio>';
+                // } else {
+                //     newElem.setAttribute("class", "remoteVideo");
+                //     newElem.innerHTML = '<video id="' + remoteProducerId + '" autoplay ></video>';
+                // }
 
-                if (params.kind == "audio") {
-                    newElem.innerHTML = '<audio id="' + remoteProducerId + '" autoplay></audio>';
-                } else {
-                    newElem.setAttribute("class", "remoteVideo");
-                    newElem.innerHTML = '<video id="' + remoteProducerId + '" autoplay ></video>';
-                }
+                // videoContainer.appendChild(newElem);
 
-                videoContainer.appendChild(newElem);
-
-                const { track } = consumer;
-                document.getElementById(remoteProducerId).srcObject = new MediaStream([track]);
+                // document.getElementById(remoteProducerId).srcObject = new MediaStream([track]);
 
                 socketRef.current.emit("consumer-resume", {
                     serverConsumerId: params.serverConsumerId,
@@ -205,7 +214,8 @@ const useVideoFunctions = () => {
         connectSendTransport,
         signalNewConsumerTransport,
         getProducers,
-        connectRecvTransport
+        connectRecvTransport,
+        consumers
     };
 };
 

@@ -3,12 +3,13 @@ import useAuth from '../../Hooks/useAuth';
 import useMedia from '../../Hooks/useMedia';
 import useToggle from '../../Hooks/useToggle';
 import useVideoFunctions from '../../Hooks/useVideoFunctions';
+import MediaElement from '../MediaElement/MediaElement';
 import { useParams } from 'react-router-dom';
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Tldraw } from "tldraw";
 import * as mediasoup from 'mediasoup-client'
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 export default function VideoContainer() {
 
@@ -25,7 +26,7 @@ export default function VideoContainer() {
         videoParamsRef,
     } = useMedia();
 
-    const { createSendTransport, signalNewConsumerTransport } = useVideoFunctions();
+    const { createSendTransport, signalNewConsumerTransport, consumers } = useVideoFunctions();
 
 
     const { toggleClicked } = useToggle();
@@ -161,8 +162,17 @@ export default function VideoContainer() {
             {toggleClicked['screenshare'] && <video ref={screenVideoRef} className=' absolute mx-auto inset-0 w-[97.3%] mt-3 h-[58.1%] rounded-lg object-cover' autoPlay muted></video>}
             {/* <Webcam ref={localVideoRef} /> */}
             {/* {remoteStreams} */}
-            <div className="flex-grow"></div> 
-            <div id="videoContainer" className=' relative bottom-0 h-[40%] flex gap-1 overflow-y-auto'></div>
+            <div className="flex-grow"></div>
+            <div id="videoContainer" className=' relative bottom-0 h-[40%] flex gap-1 overflow-y-auto'>
+                {consumers.map((consumer) => (
+                    <MediaElement
+                        key={consumer.remoteProducerId}
+                        remoteProducerId={consumer.remoteProducerId}
+                        track={consumer.track}
+                        kind={consumer.kind}
+                    />
+                ))}
+            </div>
             {toggleClicked['whiteboard'] && <div className=" absolute z-20 mx-auto top-0 left-0 h-full w-full ">
                 <Tldraw />
             </div>}

@@ -57,6 +57,8 @@ function Chat() {
     const user = auth?.user;
     const [message, setMessage] = useState('');
 
+    const [fileUrl, setFileUrl] = useState('');
+
     // const msgRef = useRef();
     const fileInputRef = useRef();
     const chatMessagesContainerRef = useRef(null);
@@ -64,7 +66,7 @@ function Chat() {
     const handleSendMessage = async () => {
 
         if (fileInputRef.current.files.length > 0) {
-            const fileUrl = await uploadFile(fileInputRef.current.files[0]);
+            // const fileUrl = await uploadFile(fileInputRef.current.files[0]);
             socketRef.current.emit('message', fileUrl, user, meetingId);
         } else if (message !== '') {
             // No file selected, just send the message
@@ -82,7 +84,8 @@ function Chat() {
         // Call uploadFile only if a file is selected
         if (selectedFile) {
             try {
-                const fileUrl = await uploadFile(selectedFile);
+                const newFileUrl = await uploadFile(selectedFile);
+                setFileUrl(newFileUrl);
                 // console.log('fileUrl: ', fileUrl);
             } catch (error) {
                 console.error('Error uploading file:', error.message);

@@ -4,14 +4,10 @@ import ToolBar from '../../Components/ToolBar/ToolBar';
 import SideBar from '../../Components/SideBar/SideBar';
 import VideoContainer from '../../Components/VideoContainer/VideoContainer';
 import useMedia from '../../Hooks/useMedia';
-import useToggle from '../../Hooks/useToggle';
-import WhiteBoard from '../../Components/WhiteBoard/WhiteBoard';
 // import useToggle from '../../Hooks/useToggle';
 
 export default function MeetingRoom() {
-    const { socketRef, setChat, setPeople } = useMedia();
-
-    const { toggleClicked } = useToggle();
+    const { socketRef, setChat, setPeople, people, chat } = useMedia();
 
     const [isSocketConnected, setIsSocketConnected] = useState(false);
 
@@ -39,7 +35,7 @@ export default function MeetingRoom() {
             // socketRef.current.disconnect();
             if (socketRef.current) socketRef.current.disconnect();
         };
-    }, []);
+    }, [socketRef]);
 
     useEffect(() => {
         console.log("Inside useEffect");
@@ -67,7 +63,7 @@ export default function MeetingRoom() {
             socketRef.current.off('message', handleMessage);
         };
 
-    }, [socketRef]);
+    }, [socketRef, chat, people]);
 
 
     // useEffect(() => {

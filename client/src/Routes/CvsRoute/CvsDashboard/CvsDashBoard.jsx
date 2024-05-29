@@ -9,7 +9,7 @@ export default function CvsDashBoard({ project }) {
   const universityUsers = [
     {
       username: "jd-work",
-      email: "jaydeepkhandla1@gmail.com",
+      email: "jaydeepkhandla.work@gmail.com",
     },
     {
       username: "dev03",
@@ -43,7 +43,7 @@ export default function CvsDashBoard({ project }) {
 
   {/* CRD Dashboard (Top) */}
  
-  <h2 className="text-2xl font-bold text-center mb-6">Project Id: #1 || Project Name: DoorDarshan</h2>
+  <h2 className="text-2xl font-bold text-center mb-6">Project Id: #1 || Project Name: Video-Conferencing-WebApp</h2>
   {/* Coollaborating University (Above the Boxes) */}
   {/* <h2 className="text-2xl font-bold text-center mb-6">Collaborating University</h2> */}
 

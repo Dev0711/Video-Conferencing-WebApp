@@ -1,6 +1,5 @@
 import useMedia from "./useMedia";
 import useToggle from "./useToggle";
-import useVideoFunctions from "./useVideoFunctions";
 
 const useScreenShare = () => {
   const {
@@ -14,7 +13,6 @@ const useScreenShare = () => {
     // deviceRef,
   } = useMedia();
   const { handleToggleClick } = useToggle();
-  const { getProducers } = useVideoFunctions();
 
   const startScreenShare = async () => {
     try {

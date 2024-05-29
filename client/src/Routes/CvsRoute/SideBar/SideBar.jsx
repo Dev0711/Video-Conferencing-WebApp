@@ -1,5 +1,5 @@
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import React from 'react';
 
 export default function SideBar() {

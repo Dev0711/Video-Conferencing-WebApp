@@ -6,12 +6,10 @@ export default function Room() {
 
   const navigate = useNavigate();
   const [urlInput, setUrlInput] = useState('');
-  // const [meetingId, setMeetingId] = useState('');
 
   const handleJoinMeeting = (type) => {
   
     const match = urlInput.match(/\/meeting\/([^\/]+)/);
-      // const meetingId = match ? match[1] : null;
     const meetingId = match ? match[1] : null
 
     navigate(`/meeting/${meetingId}`)

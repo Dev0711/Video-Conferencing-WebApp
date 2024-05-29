@@ -8,7 +8,6 @@ export const MediaProvider = ({ children }) => {
 
   const localVideoRef = useRef(null);
   const screenVideoRef = useRef(null);
-  const remoteVideoRef = useRef(null);
 
   const socketRef = useRef(null);
 
@@ -86,7 +85,6 @@ export const MediaProvider = ({ children }) => {
         audioProducerRef,
         videoProducerRef,
         screenShareProducerRef,
-        params,
         audioParamsRef,
         videoParamsRef,
         screenShareParamsRef,
