@@ -26,7 +26,7 @@ export default function VideoContainer() {
         videoParamsRef,
     } = useMedia();
 
-    const { createSendTransport, signalNewConsumerTransport, consumers } = useVideoFunctions();
+    const { createSendTransport, signalNewConsumerTransport, consumers, setConsumers } = useVideoFunctions();
 
 
     const { toggleClicked } = useToggle();
@@ -144,9 +144,12 @@ export default function VideoContainer() {
                 );
 
                 // remove the video div element
-                videoContainer.removeChild(
-                    document.getElementById(`td-${remoteProducerId}`)
-                );
+                setConsumers((prevConsumers) => prevConsumers.filter((consumer) => consumer.remoteProducerId !== remoteProducerId));
+
+
+                // videoContainer.removeChild(
+                //     document.getElementById(`td-${remoteProducerId}`)
+                // );
             });
 
         }

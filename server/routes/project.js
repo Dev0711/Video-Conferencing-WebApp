@@ -72,7 +72,7 @@ function sendInvitations(projectId, teamMembers,projectname) {
     });
 
     teamMembers.forEach((email) => {
-        const inviteLink = `http://localhost:3000/join/${projectId}`;
+        const inviteLink = process.env.APP_BASE_URL + `/join/${projectId}`;
 
         const mailOptions = {
             from: 'harshsonaiya09@gmail.com',

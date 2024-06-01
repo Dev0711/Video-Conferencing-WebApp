@@ -13,12 +13,17 @@ export default function ProfileCard() {
     const {handleToggleClick} = useToggle();
 
     const signOut = async () => {
-        await logout()
-        handleToggleClick('profile')
-
-        setAuth(() => {return null});
-
-        navigate('/')
+        try {
+            await logout()
+        
+            handleToggleClick('profile')  
+            await setAuth(() => {return null});
+            
+            navigate('/')
+            
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     return (

@@ -1,3 +1,4 @@
+const { Method } = require('mediasoup/node/lib/fbs/request');
 const allowedOrigins = require('./allowedOrigins')
 
 const corsOptions = {
@@ -9,6 +10,7 @@ const corsOptions = {
         }
     },
     optionsSuccessStatus: 200,
+    methods: ['GET', 'POST'],
 }
 
 module.exports = corsOptions;

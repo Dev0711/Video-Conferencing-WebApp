@@ -215,7 +215,8 @@ const useVideoFunctions = () => {
         signalNewConsumerTransport,
         getProducers,
         connectRecvTransport,
-        consumers
+        consumers,
+        setConsumers,
     };
 };
 

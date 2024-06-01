@@ -20,7 +20,7 @@ export default function NavBar() {
                 <a className="nav__logo w-24 h-auto -mt-2">
                     <img src={logo} alt="ZEPT" />
                 </a>
-                {auth && Object.keys(auth).length > 0 ? <Avatar className='cursor-pointer' name={auth?.user?.username} onClick={() => handleToggleClick('profile')} size={50} round={true} /> : <button className="btn join__btn" onClick={() => navigate("/auth/login")}>Login</button>}
+                {auth && Object.keys(auth).length > 0 && auth?.user ? <Avatar className='cursor-pointer' name={auth?.user?.username} onClick={() => handleToggleClick('profile')} size={50} round={true} /> : <button className="btn join__btn" onClick={() => navigate("/auth/login")}>Login</button>}
             </nav>
             {auth && toggleClicked['profile'] && <ProfileCard />}
         </header>

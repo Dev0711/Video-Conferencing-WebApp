@@ -1,7 +1,7 @@
 import './home-style.css';
 import { useNavigate } from 'react-router-dom';
 import MeetImage from '../../assets/images/4.jpg';
-// import { useEffect } from 'react';
+import { useEffect } from 'react';
 import useAuth from '../../Hooks/useAuth';
 // import useToggle from '../../Hooks/useToggle';
 // import Avatar from 'react-avatar'
@@ -15,9 +15,11 @@ export default function Home() {
 
     // const { toggleClicked, handleToggleClick } = useToggle();
 
-    console.log('this is auth at home -> ', auth);
     // console.log('this is username -> ', auth?.user?.username);
     // console.log(auth?.length);
+    useEffect(() => {
+        console.log('this is auth at home -> ', auth);
+    }, [auth]);
 
     return (
         <>
