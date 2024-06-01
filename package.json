@@ -1,0 +1,16 @@
+{
+    "name": "video-conferencing-webapp",
+    "version": "1.0.0",
+    "description": "Description of your MERN application",
+    "main": "server/server.js",
+    "scripts": {
+      "start": "node server/server.js", 
+      "dev": "nodemon server/server.js", 
+      "build": "echo 'No build script specified'",
+      "test": "echo 'No test script specified'" 
+    },
+    "keywords": [],
+    "author": "Jaydeep Khandla",
+    "license": "ISC"
+  }
+  
