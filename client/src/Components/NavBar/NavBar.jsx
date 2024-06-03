@@ -17,7 +17,7 @@ export default function NavBar() {
     return (
         <header className='header'>
             <nav className='nav w-full max-w-full px-6'>
-                <a className="nav__logo w-24 h-auto -mt-2">
+                <a href="/" className="nav__logo w-24 h-auto -mt-2">
                     <img src={logo} alt="ZEPT" />
                 </a>
                 {auth && Object.keys(auth).length > 0 && auth?.user ? <Avatar className='cursor-pointer' name={auth?.user?.username} onClick={() => handleToggleClick('profile')} size={50} round={true} /> : <button className="btn join__btn" onClick={() => navigate("/auth/login")}>Login</button>}
