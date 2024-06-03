@@ -127,8 +127,6 @@ export default function VideoContainer() {
             }
             );
 
-            const videoContainer = document.getElementById('videoContainer')
-
             socketRef.current.on("producer-closed", ({ remoteProducerId }) => {
                 // server notification is received when a producer is closed
                 // we need to close the client-side consumer and associated transport
