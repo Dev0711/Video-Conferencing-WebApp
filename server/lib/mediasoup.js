@@ -52,6 +52,7 @@ const mediaCodecs = [
 //   },
 // ];
 
+//? Create a mediasoup Worker to manage the mediasoup Routers
 const createWorker = async () => {
   const worker = await mediasoup.createWorker({
     rtcMinPort: 2000,
