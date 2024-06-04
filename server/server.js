@@ -70,6 +70,10 @@ app.use(require("./routes/project"));
 //   res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
 // });
 
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
 // Error Handling Middleware
 // app.use((err, req, res, next) => {
 //   console.error(err.stack);
